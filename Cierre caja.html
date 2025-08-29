@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cierres - Barbería NatWin</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-tabs .nav-link {
+            border-radius: 15px 15px 0 0;
+            border: 2px solid transparent;
+            color: #667eea;
+            font-weight: 600;
+            padding: 15px 25px;
+            margin-right: 5px;
+            background: #f8f9fa;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 0 15px 15px 15px;
+            padding: 0;
+            border: 2px solid #667eea;
+        }
+        
+        .tab-pane {
+            padding: 0;
+        }
+        
+        /* Estilos específicos como tu app actual */
+        .header-section {
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 13px 13px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .total-pagar {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .barbero-section {
+            margin: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .barbero-card {
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .barbero-empleado {
+            background: #007bff;
+            color: white;
+        }
+        
+        .barbero-admin {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .stat-boxes {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .stat-box {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value.success { color: #28a745; }
+        .stat-value.danger { color: #dc3545; }
+        
+        .pagar-section {
+            background: #28a745;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .pagar-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .detail-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .detail-row.highlight {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .btn-pagar {
+            background: #28a745;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .control-section {
+            background: #ffc107;
+            color: #212529;
+            padding: 15px 20px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        
+        .payment-methods {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .payment-method {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .payment-efectivo { background: #28a745; }
+        .payment-mp { background: #007bff; }
+        .payment-rut { background: #17a2b8; }
+        
+        .payment-amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .cash-status {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .cash-status.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .resumen-section {
+            background: #17a2b8;
+            color: white;
+            padding: 15px 20px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .resumen-item {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .resumen-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .instructions h6 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            margin-bottom: 0;
+            color: #6c757d;
+        }
+        
+        /* Adaptaciones para mensual y diario */
+        .periodo-badge {
+            background: #17a2b8;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        
+        <!-- Pestañas principales -->
+        <ul class="nav nav-tabs mb-0" id="cierreTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="diario-tab" data-bs-toggle="tab" data-bs-target="#diario" type="button" role="tab">
+                    <i class="bi bi-calendar-day me-2"></i>Cierre Diario
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="semanal-tab" data-bs-toggle="tab" data-bs-target="#semanal" type="button" role="tab">
+                    <i class="bi bi-calendar-week me-2"></i>Cierre Semanal
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="mensual-tab" data-bs-toggle="tab" data-bs-target="#mensual" type="button" role="tab">
+                    <i class="bi bi-calendar-month me-2"></i>Cierre Mensual
+                </button>
+            </li>
+        </ul>
+
+        <!-- Contenido de pestañas -->
+        <div class="tab-content" id="cierreTabsContent">
+            
+            <!-- PESTAÑA CIERRE DIARIO -->
+            <div class="tab-pane fade show active" id="diario" role="tabpanel">
+                
+                <!-- Header -->
+                <div class="header-section">
+                    <i class="bi bi-clipboard-check" style="font-size: 1.5rem;"></i>
+                    <h5 class="mb-0">Cierre de Caja - Resumen del Día</h5>
+                    <span class="periodo-badge" id="fechaDiaria">25 de Diciembre, 2025</span>
+                </div>
+                
+                <!-- Total a mostrar (sin descuentos) -->
+                <div class="total-pagar">
+                    <h6><i class="bi bi-cash-stack me-2"></i>TOTAL GENERADO HOY:</h6>
+                    <h2 style="color: #28a745; margin: 10px 0;">$105.000</h2>
+                    <small class="text-muted">Adelantos registrados pero NO descontados</small>
+                </div>
+                
+                <!-- Desglose por barbero -->
+                <div class="barbero-section">
+                    <div class="row">
+                        <!-- Empleado -->
+                        <div class="col-md-6">
+                            <div class="barbero-card">
+                                <div class="barbero-empleado" style="padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">Barbero (Empleado) 🧑‍💼</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid #007bff; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div class="stat-boxes">
+                                        <div class="stat-box">
+                                            <div class="stat-value success">$60.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value danger">$15.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Dados</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pagar-section">
+                                        <div class="pagar-amount">$60.000</div>
+                                        <strong>GANANCIA DEL DÍA</strong>
+                                    </div>
+                                    
+                                    <div class="detail-list">
+                                        <div class="detail-row">
+                                            <span>Servicios realizados:</span>
+                                            <span>8</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Total cobrado:</span>
+                                            <span>$120.000</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Su comisión (50%):</span>
+                                            <span>$60.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #ffc107;">
+                                            <span>Adelantos anotados:</span>
+                                            <span>$15.000 (Solo registro)</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div class="detail-row highlight">
+                                            <span>GANANCIA HOY:</span>
+                                            <span>$60.000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; font-size: 0.85rem; color: #856404;">
+                                        <strong>Nota:</strong> Los adelantos se descuentan en el cierre semanal
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ewin -->
+                        <div class="col-md-6">
+                            <div class="barbero-card">
+                                <div class="barbero-admin" style="padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">Ewin (Administrador) 👑</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid #ffc107; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div class="stat-boxes">
+                                        <div class="stat-box">
+                                            <div class="stat-value success">$45.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value danger">$10.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Dados</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pagar-section">
+                                        <div class="pagar-amount">$45.000</div>
+                                        <strong>GANANCIA DEL DÍA</strong>
+                                    </div>
+                                    
+                                    <div class="detail-list">
+                                        <div class="detail-row">
+                                            <span>Servicios realizados:</span>
+                                            <span>3</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Total cobrado:</span>
+                                            <span>$45.000</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Su comisión (100%):</span>
+                                            <span>$45.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #ffc107;">
+                                            <span>Adelantos anotados:</span>
+                                            <span>$10.000 (Solo registro)</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div class="detail-row highlight">
+                                            <span>GANANCIA HOY:</span>
+                                            <span>$45.000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; font-size: 0.85rem; color: #856404;">
+                                        <strong>Nota:</strong> Los adelantos se descuentan en el cierre semanal
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control de formas de pago -->
+                <div class="control-section">
+                    <h6><i class="bi bi-credit-card me-2"></i>Control de Formas de Pago del Día</h6>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method payment-efectivo">
+                            <i class="bi bi-cash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$60.000</div>
+                            <div style="font-size: 0.9rem;">Efectivo Cobrado</div>
+                        </div>
+                        <div class="payment-method payment-mp">
+                            <i class="bi bi-credit-card" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$30.000</div>
+                            <div style="font-size: 0.9rem;">Mercado Pago</div>
+                        </div>
+                        <div class="payment-method payment-rut">
+                            <i class="bi bi-bank" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$15.000</div>
+                            <div style="font-size: 0.9rem;">Cuenta Rut</div>
+                        </div>
+                    </div>
+                    
+                    <div class="cash-status success">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>💰 Estado del Efectivo en Caja:</strong><br>
+                                <strong>Efectivo cobrado:</strong> $60.000<br>
+                                <strong>Adelantos dados:</strong> $25.000
+                            </div>
+                            <div class="text-end">
+                                <strong>Efectivo disponible:</strong> 
+                                <span style="font-size: 1.3rem; color: #28a745;">$35.000</span><br>
+                                <span style="color: #28a745;">✅ Efectivo suficiente</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumen del día -->
+                <div class="resumen-section">
+                    <h6><i class="bi bi-bar-chart me-2"></i>Resumen del Día</h6>
+                    
+                    <div class="resumen-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="resumen-item">
+                            <div class="resumen-value">$105.000</div>
+                            <div style="font-size: 0.85rem;">Total Ingresado</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$25.000</div>
+                            <div style="font-size: 0.85rem;">Adelantos Dados</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$105.000</div>
+                            <div style="font-size: 0.85rem;">Total Ganado</div>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <h6>💡 Información del Cierre Diario:</h6>
+                        <ul style="margin-bottom: 0; color: #495057;">
+                            <li><strong>Total generado:</strong> Se registra sin descuentos por adelantos</li>
+                            <li><strong>Adelantos:</strong> Solo se anotan para control, no afectan ganancias del día</li>
+                            <li><strong>Efectivo:</strong> Disponible para operaciones del día siguiente</li>
+                            <li><strong>Descuentos:</strong> Los adelantos se descontarán en el cierre semanal</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PESTAÑA CIERRE SEMANAL (Tu diseño actual) -->
+            <div class="tab-pane fade" id="semanal" role="tabpanel">
+                
+                <!-- Header -->
+                <div class="header-section">
+                    <i class="bi bi-calculator" style="font-size: 1.5rem;"></i>
+                    <h5 class="mb-0">Cierre de Caja - Pagos del Sábado</h5>
+                </div>
+                
+                <!-- Total a pagar -->
+                <div class="total-pagar">
+                    <h6><i class="bi bi-cash-stack me-2"></i>TOTAL GENERADO ESTA SEMANA:</h6>
+                    <h2 style="color: #28a745; margin: 10px 0;">$1.285.000</h2>
+                    <small class="text-muted">Total cobrado por ambos barberos</small>
+                </div>
+                
+                <!-- Desglose por barbero -->
+                <div class="barbero-section">
+                    <div class="row">
+                        <!-- Empleado -->
+                        <div class="col-md-6">
+                            <div class="barbero-card">
+                                <div class="barbero-empleado" style="padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">Barbero (Empleado) 🧑‍💼</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid #007bff; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div class="stat-boxes">
+                                        <div class="stat-box">
+                                            <div class="stat-value success">$480.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value danger">$120.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Dados</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pagar-section">
+                                        <div class="pagar-amount">$360.000</div>
+                                        <strong>PAGAR EL SÁBADO</strong>
+                                    </div>
+                                    
+                                    <div class="detail-list">
+                                        <div class="detail-row">
+                                            <span>Servicios realizados:</span>
+                                            <span>42</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Total cobrado:</span>
+                                            <span>$960.000</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Su comisión (50%):</span>
+                                            <span>$480.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #dc3545;">
+                                            <span>Menos adelantos:</span>
+                                            <span>-$120.000</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div class="detail-row highlight">
+                                            <span>NETO A PAGAR:</span>
+                                            <span>$360.000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn-pagar">
+                                        <i class="bi bi-check-circle me-2"></i>Marcar como Pagado ($360.000)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ewin -->
+                        <div class="col-md-6">
+                            <div class="barbero-card">
+                                <div class="barbero-admin" style="padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">Ewin (Administrador) 👑</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid #ffc107; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div class="stat-boxes">
+                                        <div class="stat-box">
+                                            <div class="stat-value success">$325.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value danger">$60.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Dados</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pagar-section">
+                                        <div class="pagar-amount">$265.000</div>
+                                        <strong>PAGAR EL SÁBADO</strong>
+                                    </div>
+                                    
+                                    <div class="detail-list">
+                                        <div class="detail-row">
+                                            <span>Servicios realizados:</span>
+                                            <span>18</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Total cobrado:</span>
+                                            <span>$325.000</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Su comisión (100%):</span>
+                                            <span>$325.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #dc3545;">
+                                            <span>Menos adelantos:</span>
+                                            <span>-$60.000</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div class="detail-row highlight">
+                                            <span>NETO A PAGAR:</span>
+                                            <span>$265.000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn-pagar">
+                                        <i class="bi bi-check-circle me-2"></i>Marcar como Pagado ($265.000)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control de formas de pago -->
+                <div class="control-section">
+                    <h6><i class="bi bi-credit-card me-2"></i>Control de Formas de Pago y Caja</h6>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method payment-efectivo">
+                            <i class="bi bi-cash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$825.000</div>
+                            <div style="font-size: 0.9rem;">Efectivo Cobrado</div>
+                        </div>
+                        <div class="payment-method payment-mp">
+                            <i class="bi bi-credit-card" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$290.000</div>
+                            <div style="font-size: 0.9rem;">Mercado Pago</div>
+                        </div>
+                        <div class="payment-method payment-rut">
+                            <i class="bi bi-bank" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$170.000</div>
+                            <div style="font-size: 0.9rem;">Cuenta Rut</div>
+                        </div>
+                    </div>
+                    
+                    <div class="cash-status success">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>💰 Estado del Efectivo en Caja:</strong><br>
+                                <strong>Efectivo cobrado:</strong> $825.000<br>
+                                <strong>Adelantos dados:</strong> $180.000
+                            </div>
+                            <div class="text-end">
+                                <strong>Efectivo disponible:</strong> 
+                                <span style="font-size: 1.3rem; color: #28a745;">$645.000</span><br>
+                                <span style="color: #28a745;">✅ Efectivo suficiente</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumen de cierre -->
+                <div class="resumen-section">
+                    <h6><i class="bi bi-bar-chart me-2"></i>Resumen de Cierre</h6>
+                    
+                    <div class="resumen-grid">
+                        <div class="resumen-item">
+                            <div class="resumen-value">$1.285.000</div>
+                            <div style="font-size: 0.85rem;">Total Ingresado</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$120.000</div>
+                            <div style="font-size: 0.85rem;">Adelantos Dados</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$360.000</div>
+                            <div style="font-size: 0.85rem;">A Pagar Empleado</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$805.000</div>
+                            <div style="font-size: 0.85rem;">Ganancia Barbería</div>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <h6>💡 Instrucciones para el cierre:</h6>
+                        <ul style="margin-bottom: 0; color: #495057;">
+                            <li><strong>Efectivo en caja:</strong> Debes tener $220.000 en billetes</li>
+                            <li><strong>Mercado Pago:</strong> Verifica que llegaron $280.000 a tu cuenta</li>
+                            <li><strong>Cuenta RUT:</strong> Confirma $125.000 en transferencias</li>
+                            <li><strong>Pagar empleados:</strong> Total $625.000 (ya descontando adelantos)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PESTAÑA CIERRE MENSUAL -->
+            <div class="tab-pane fade" id="mensual" role="tabpanel">
+                
+                <!-- Header -->
+                <div class="header-section">
+                    <i class="bi bi-calendar-month" style="font-size: 1.5rem;"></i>
+                    <h5 class="mb-0">Cierre de Caja - Balance Mensual</h5>
+                    <span class="periodo-badge">Último Sábado: 28 Diciembre</span>
+                </div>
+                
+                <!-- Total mensual -->
+                <div class="total-pagar">
+                    <h6><i class="bi bi-calendar-month me-2"></i>TOTAL GENERADO ESTE MES:</h6>
+                    <h2 style="color: #28a745; margin: 10px 0;">$5.240.000</h2>
+                    <small class="text-muted">Total cobrado por ambos barberos durante el mes</small>
+                </div>
+                
+                <!-- Comparativa mensual -->
+                <div class="barbero-section">
+                    <div class="row">
+                        <!-- Empleado - Mes completo -->
+                        <div class="col-md-6">
+                            <div class="barbero-card">
+                                <div class="barbero-empleado" style="padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">Barbero (Empleado) - Mes Completo</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid #007bff; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div class="stat-boxes">
+                                        <div class="stat-box">
+                                            <div class="stat-value success">$1.920.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value danger">$450.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Mes</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pagar-section">
+                                        <div class="pagar-amount">$1.470.000</div>
+                                        <strong>PAGADO ESTE MES</strong>
+                                    </div>
+                                    
+                                    <div class="detail-list">
+                                        <div class="detail-row">
+                                            <span>Servicios del mes:</span>
+                                            <span>168 servicios</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Total cobrado:</span>
+                                            <span>$3.840.000</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Su comisión (50%):</span>
+                                            <span>$1.920.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #dc3545;">
+                                            <span>Menos adelantos:</span>
+                                            <span>-$450.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #17a2b8;">
+                                            <span>Promedio diario:</span>
+                                            <span>$49.000</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div class="detail-row highlight">
+                                            <span>TOTAL MES:</span>
+                                            <span>$1.470.000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #e7f3ff; border: 1px solid #bee5eb; padding: 12px; border-radius: 5px;">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: #007bff;">5.6</div>
+                                                <small>Servicios/día</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: #28a745;">$11.429</div>
+                                                <small>Por servicio</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: #ffc107;">30</div>
+                                                <small>Días trabajados</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ewin - Mes completo -->
+                        <div class="col-md-6">
+                            <div class="barbero-card">
+                                <div class="barbero-admin" style="padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">Ewin (Administrador) - Mes Completo</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid #ffc107; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div class="stat-boxes">
+                                        <div class="stat-box">
+                                            <div class="stat-value success">$1.400.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value danger">$230.000</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Mes</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pagar-section">
+                                        <div class="pagar-amount">$1.170.000</div>
+                                        <strong>PAGADO ESTE MES</strong>
+                                    </div>
+                                    
+                                    <div class="detail-list">
+                                        <div class="detail-row">
+                                            <span>Servicios del mes:</span>
+                                            <span>84 servicios</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Total cobrado:</span>
+                                            <span>$1.400.000</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Su comisión (100%):</span>
+                                            <span>$1.400.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #dc3545;">
+                                            <span>Menos adelantos:</span>
+                                            <span>-$230.000</span>
+                                        </div>
+                                        <div class="detail-row" style="color: #17a2b8;">
+                                            <span>Promedio diario:</span>
+                                            <span>$39.000</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div class="detail-row highlight">
+                                            <span>TOTAL MES:</span>
+                                            <span>$1.170.000</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #fff8e1; border: 1px solid #ffc107; padding: 12px; border-radius: 5px;">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: #ffc107;">2.8</div>
+                                                <small>Servicios/día</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: #28a745;">$16.667</div>
+                                                <small>Por servicio</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: #17a2b8;">30</div>
+                                                <small>Días trabajados</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control mensual -->
+                <div class="control-section">
+                    <h6><i class="bi bi-graph-up me-2"></i>Análisis Mensual de Formas de Pago</h6>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method payment-efectivo">
+                            <i class="bi bi-cash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$3.150.000</div>
+                            <div style="font-size: 0.9rem;">Efectivo del Mes</div>
+                        </div>
+                        <div class="payment-method payment-mp">
+                            <i class="bi bi-credit-card" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$1.290.000</div>
+                            <div style="font-size: 0.9rem;">Mercado Pago</div>
+                        </div>
+                        <div class="payment-method payment-rut">
+                            <i class="bi bi-bank" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <div class="payment-amount">$800.000</div>
+                            <div style="font-size: 0.9rem;">Cuenta Rut</div>
+                        </div>
+                    </div>
+                    
+                    <div class="cash-status success">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>📊 Análisis del Mes:</strong><br>
+                                <strong>Total generado:</strong> $5.240.000<br>
+                                <strong>Adelantos dados:</strong> $680.000<br>
+                                <strong>Efectivo neto:</strong> $2.470.000
+                            </div>
+                            <div class="col-md-6">
+                                <strong>🎯 Mejores días:</strong><br>
+                                <strong>• Viernes 15 Dic:</strong> $285.000<br>
+                                <strong>• Sábado 9 Dic:</strong> $268.000<br>
+                                <strong>• Viernes 22 Dic:</strong> $252.000
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumen mensual final -->
+                <div class="resumen-section">
+                    <h6><i class="bi bi-calendar-check me-2"></i>Resumen Ejecutivo del Mes</h6>
+                    
+                    <div class="resumen-grid">
+                        <div class="resumen-item">
+                            <div class="resumen-value">$5.240.000</div>
+                            <div style="font-size: 0.85rem;">Total Mensual</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$450.000</div>
+                            <div style="font-size: 0.85rem;">Adelantos Dados</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$1.470.000</div>
+                            <div style="font-size: 0.85rem;">Pagado Empleado</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-value">$3.320.000</div>
+                            <div style="font-size: 0.85rem;">Ganancia Barbería</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="instructions">
+                                <h6 style="color: #28a745;">🏆 Logros del mes:</h6>
+                                <ul style="color: #495057; margin-bottom: 0;">
+                                    <li>252 servicios totales</li>
+                                    <li>Meta alcanzada: 104%</li>
+                                    <li>Crecimiento vs mes anterior: +11%</li>
+                                    <li>Promedio diario: $174.667</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="instructions">
+                                <h6 style="color: #007bff;">📈 Servicios populares:</h6>
+                                <ul style="color: #495057; margin-bottom: 0;">
+                                    <li>Fade Degradados (35%)</li>
+                                    <li>Corte Tijera (28%)</li>
+                                    <li>Barba Premium (18%)</li>
+                                    <li>Servicio Full (12%)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="instructions">
+                                <h6 style="color: #ffc107;">🎯 Proyección enero:</h6>
+                                <ul style="color: #495057; margin-bottom: 0;">
+                                    <li>Estimado: $5.8M (+11%)</li>
+                                    <li>Servicios proyectados: 280</li>
+                                    <li>Nuevas promociones: 3</li>
+                                    <li>Meta 2025: $70M anuales</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Inicializar fechas
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoy = new Date();
+            
+            // Fecha diaria
+            if (document.getElementById('fechaDiaria')) {
+                document.getElementById('fechaDiaria').textContent = hoy.toLocaleDateString('es-CL', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+        });
+        
+        // Funciones de actualización
+        function actualizarDatosDiarios() {
+            console.log('Actualizando datos diarios...');
+            showToast('Datos diarios actualizados correctamente', 'success');
+        }
+        
+        function actualizarDatosSemanales() {
+            console.log('Actualizando datos semanales...');
+            showToast('Datos semanales actualizados correctamente', 'success');
+        }
+        
+        function actualizarDatosMensuales() {
+            console.log('Actualizando datos mensuales...');
+            showToast('Datos mensuales actualizados correctamente', 'success');
+        }
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+        
+        // Event listeners para tabs
+        document.addEventListener('shown.bs.tab', function (event) {
+            const activeTab = event.target.getAttribute('data-bs-target');
+            console.log('Pestaña activada:', activeTab);
+        });
+    </script>
+</body>
+</html>

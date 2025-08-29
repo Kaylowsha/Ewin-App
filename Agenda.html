@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbería NatWin - Agenda tu Hora</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #28a745;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Header y navegación */
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: white !important;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        /* Tarjetas de servicios */
+        .servicio-card .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .servicio-card .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+        
+        .popular-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ffa726) !important;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Botones */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .btn-outline-primary.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        /* Modal */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        /* Horarios disponibles */
+        .horario-slot {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .horario-slot:hover {
+            border-color: var(--primary-color);
+            background-color: #f8f9fa;
+        }
+        
+        .horario-slot.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        .horario-slot.ocupado {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            cursor: not-allowed;
+        }
+        
+        /* Indicadores de pasos */
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 20px;
+            opacity: 0.5;
+        }
+        
+        .step-indicator.active {
+            opacity: 1;
+        }
+        
+        .step-indicator span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .step-indicator:not(.active) span {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        /* Animaciones */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="bi bi-scissors me-2"></i>
+                <strong>Barbería NatWin</strong>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#servicios">Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="empleado.html" target="_blank">
+                            <i class="bi bi-gear me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Barbería NatWin</h1>
+            <p class="lead mb-4">El mejor estilo para ti, con profesionales expertos</p>
+            <p class="mb-4">
+                <i class="bi bi-geo-alt me-2"></i>Santiago Centro • 
+                <i class="bi bi-clock me-2"></i>Lun-Sáb 9:00-19:00
+            </p>
+            <a href="#servicios" class="btn btn-light btn-lg me-3">
+                <i class="bi bi-calendar-plus me-2"></i>Agendar Hora
+            </a>
+            <a href="https://wa.me/56912345678" class="btn btn-outline-light btn-lg" target="_blank">
+                <i class="bi bi-whatsapp me-2"></i>WhatsApp
+            </a>
+        </div>
+    </section>
+
+    <!-- Servicios Section -->
+    <section id="servicios" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Nuestros Servicios</h2>
+                <p class="lead text-muted">Calidad profesional, precios justos</p>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="text-center mb-5">
+                <button class="btn btn-outline-primary me-2 active" data-filter="todos">
+                    Todos
+                </button>
+                <button class="btn btn-outline-primary me-2" data-filter="cortes">
+                    Cortes
+                </button>
+                <button class="btn btn-outline-primary me-2" data-filter="barbas">
+                    Barbas
+                </button>
+                <button class="btn btn-outline-primary" data-filter="premium">
+                    Premium
+                </button>
+            </div>
+
+            <!-- Grid de servicios -->
+            <div class="row" id="servicios-grid">
+                <!-- Se genera dinámicamente -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto Section -->
+    <section id="contacto" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Contáctanos</h3>
+                    <div class="mb-3">
+                        <i class="bi bi-geo-alt text-primary me-2"></i>
+                        <strong>Dirección:</strong> Calle Principal 123, Santiago Centro
+                    </div>
+                    <div class="mb-3">
+                        <i class="bi bi-telephone text-primary me-2"></i>
+                        <strong>Teléfono:</strong> +56 9 1234 5678
+                    </div>
+                    <div class="mb-3">
+                        <i class="bi bi-clock text-primary me-2"></i>
+                        <strong>Horarios:</strong><br>
+                        Lunes a Viernes: 9:00 - 19:00<br>
+                        Sábados: 9:00 - 17:00<br>
+                        Domingos: Cerrado
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3>Síguenos</h3>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="bi bi-instagram"></i> Instagram
+                        </a>
+                        <a href="#" class="btn btn-outline-success">
+                            <i class="bi bi-whatsapp"></i> WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p>&copy; 2025 Barbería NatWin. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Base de datos de servicios
+        const serviciosCatalogo = {
+            'corte-tradicional-estudiante': {
+                nombre: 'Corte Tradicional - Estudiante',
+                precio: 8000,
+                duracion: 30,
+                descripcion: 'Corte clásico con tijera y máquina, ideal para estudiantes',
+                categoria: 'cortes',
+                imagen: 'https://via.placeholder.com/300x200/667eea/ffffff?text=Corte+Tradicional',
+                popular: false
+            },
+            'corte-tijera': {
+                nombre: 'Corte Tijera',
+                precio: 12000,
+                duracion: 40,
+                descripcion: 'Corte completo con tijera, técnica tradicional',
+                categoria: 'cortes',
+                imagen: 'https://via.placeholder.com/300x200/667eea/ffffff?text=Corte+Tijera',
+                popular: false
+            },
+            'fade-degradados': {
+                nombre: 'Fade - Degradados',
+                precio: 18000,
+                duracion: 45,
+                descripcion: 'Degradado moderno con transiciones suaves',
+                categoria: 'cortes',
+                imagen: 'https://via.placeholder.com/300x200/667eea/ffffff?text=Fade+Degradado',
+                popular: true
+            },
+            'barba-rasurado': {
+                nombre: 'Barba Rasurado',
+                precio: 8000,
+                duracion: 20,
+                descripcion: 'Rasurado completo con navaja tradicional',
+                categoria: 'barbas',
+                imagen: 'https://via.placeholder.com/300x200/28a745/ffffff?text=Barba+Rasurado',
+                popular: false
+            },
+            'barba-premium': {
+                nombre: 'Barba Premium',
+                precio: 15000,
+                duracion: 30,
+                descripcion: 'Perfilado, recorte y tratamiento completo de barba',
+                categoria: 'barbas',
+                imagen: 'https://via.placeholder.com/300x200/28a745/ffffff?text=Barba+Premium',
+                popular: true
+            },
+            'servicio-full': {
+                nombre: 'Servicio Full',
+                precio: 25000,
+                duracion: 60,
+                descripcion: 'Corte + Barba + Tratamiento facial completo',
+                categoria: 'premium',
+                imagen: 'https://via.placeholder.com/300x200/ffc107/ffffff?text=Servicio+Full',
+                popular: true
+            },
+            'limpieza-facial-premium': {
+                nombre: 'Limpieza Facial Premium',
+                precio: 20000,
+                duracion: 45,
+                descripcion: 'Tratamiento facial completo con productos premium',
+                categoria: 'premium',
+                imagen: 'https://via.placeholder.com/300x200/ffc107/ffffff?text=Facial+Premium',
+                popular: false
+            }
+        };
+
+        // Variables globales
+        let servicioSeleccionado = null;
+        let citaData = {};
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            generarTarjetasServicios();
+            configurarFiltros();
+            configurarNavegacion();
+        });
+
+        // Generar tarjetas de servicios
+        function generarTarjetasServicios(filtro = 'todos') {
+            const grid = document.getElementById('servicios-grid');
+            grid.innerHTML = '';
+            
+            Object.entries(serviciosCatalogo).forEach(([id, servicio]) => {
+                if (filtro === 'todos' || servicio.categoria === filtro) {
+                    const tarjeta = crearTarjetaServicio(id, servicio);
+                    grid.insertAdjacentHTML('beforeend', tarjeta);
+                }
+            });
+        }
+
+        // Crear tarjeta individual de servicio
+        function crearTarjetaServicio(id, servicio) {
+            const popularBadge = servicio.popular ? 
+                '<span class="badge popular-badge position-absolute top-0 start-0 m-2">Popular</span>' : '';
+            
+            return `
+                <div class="col-lg-4 col-md-6 mb-4 servicio-card fade-in">
+                    <div class="card h-100 position-relative">
+                        ${popularBadge}
+                        
+                        <img src="${servicio.imagen}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${servicio.nombre}</h5>
+                            <p class="card-text text-muted">${servicio.descripcion}</p>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="h4 text-primary mb-0">$${servicio.precio.toLocaleString()}</span>
+                                    <small class="text-muted">${servicio.duracion} min</small>
+                                </div>
+                                
+                                <button class="btn btn-primary w-100" onclick="abrirAgendamiento('${id}')">
+                                    <i class="bi bi-calendar-plus me-2"></i>
+                                    Agendar Hora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Configurar filtros
+        function configurarFiltros() {
+            document.querySelectorAll('[data-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Actualizar botones activos
+                    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filtrar servicios
+                    const filtro = this.getAttribute('data-filter');
+                    generarTarjetasServicios(filtro);
+                });
+            });
+        }
+
+        // Configurar navegación suave
+        function configurarNavegacion() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        const offsetTop = target.offsetTop - 70; // Compensar navbar fijo
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Abrir modal de agendamiento
+        function abrirAgendamiento(servicioId) {
+            servicioSeleccionado = serviciosCatalogo[servicioId];
+            citaData = {
+                servicioId: servicioId,
+                paso: 1
+            };
+            
+            mostrarModalAgendamiento();
+        }
+
+        // Mostrar modal de agendamiento
+        function mostrarModalAgendamiento() {
+            const modalHTML = `
+                <div class="modal fade" id="modalAgendamiento" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="bi bi-calendar-plus me-2"></i>
+                                    Agendar: ${servicioSeleccionado.nombre}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Indicador de pasos -->
+                                <div class="d-flex justify-content-center mb-4">
+                                    <div class="d-flex">
+                                        <div class="step-indicator active" data-paso="1">
+                                            <span>1</span>
+                                            <small>Fecha y Hora</small>
+                                        </div>
+                                        <div class="step-indicator" data-paso="2">
+                                            <span>2</span>
+                                            <small>Tus Datos</small>
+                                        </div>
+                                        <div class="step-indicator" data-paso="3">
+                                            <span>3</span>
+                                            <small>Confirmación</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contenido de pasos -->
+                                <div id="contenido-pasos">
+                                    <!-- Se genera dinámicamente -->
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" id="btn-anterior" onclick="pasoAnterior()">
+                                    <i class="bi bi-arrow-left me-1"></i>Anterior
+                                </button>
+                                <button type="button" class="btn btn-primary" id="btn-siguiente" onclick="pasoSiguiente()">
+                                    Siguiente<i class="bi bi-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remover modal existente si existe
+            const existingModal = document.getElementById('modalAgendamiento');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            mostrarPaso(1);
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalAgendamiento'));
+            modal.show();
+        }
+
+        // Mostrar paso específico
+        function mostrarPaso(paso) {
+            citaData.paso = paso;
+            
+            // Actualizar indicadores de pasos
+            document.querySelectorAll('.step-indicator').forEach(indicator => {
+                indicator.classList.remove('active');
+            });
+            document.querySelector(`[data-paso="${paso}"]`).classList.add('active');
+            
+            // Mostrar contenido del paso
+            const contenido = document.getElementById('contenido-pasos');
+            
+            switch(paso) {
+                case 1:
+                    contenido.innerHTML = generarPaso1();
+                    document.getElementById('btn-anterior').style.display = 'none';
+                    document.getElementById('btn-siguiente').innerHTML = 'Siguiente<i class="bi bi-arrow-right ms-1"></i>';
+                    break;
+                case 2:
+                    contenido.innerHTML = generarPaso2();
+                    document.getElementById('btn-anterior').style.display = 'inline-block';
+                    document.getElementById('btn-siguiente').innerHTML = 'Siguiente<i class="bi bi-arrow-right ms-1"></i>';
+                    break;
+                case 3:
+                    contenido.innerHTML = generarPaso3();
+                    document.getElementById('btn-anterior').style.display = 'inline-block';
+                    document.getElementById('btn-siguiente').innerHTML = '<i class="bi bi-whatsapp me-1"></i>Confirmar por WhatsApp';
+                    break;
+            }
+        }
+
+        // Generar contenido paso 1
+        function generarPaso1() {
+            const fechaMinima = new Date();
+            fechaMinima.setDate(fechaMinima.getDate() + 1); // Mañana
+            const fechaMaxima = new Date();
+            fechaMaxima.setDate(fechaMaxima.getDate() + 30); // 30 días
+            
+            return `
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Fecha preferida</label>
+                        <input type="date" class="form-control" id="fecha-cita" 
+                               min="${fechaMinima.toISOString().split('T')[0]}" 
+                               max="${fechaMaxima.toISOString().split('T')[0]}"
+                               onchange="cargarHorarios()">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Barbero preferido</label>
+                        <select class="form-select" id="barbero-preferido" onchange="cargarHorarios()">
+                            <option value="">Sin preferencia</option>
+                            <option value="empleado">Barbero Principal</option>
+                            <option value="ewin">Ewin (Dueño)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="fw-bold">Horarios disponibles</h6>
+                    <div id="horarios-disponibles" class="row">
+                        <div class="col-12 text-center text-muted py-4">
+                            <i class="bi bi-calendar-date display-4 mb-3"></i>
+                            <p>Selecciona una fecha para ver horarios disponibles</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>${servicioSeleccionado.nombre}</strong> - Duración aproximada: ${servicioSeleccionado.duracion} minutos
+                </div>
+            `;
+        }
+
+        // Generar contenido paso 2
+        function generarPaso2() {
+            return `
+                <h6 class="fw-bold mb-3">Ingresa tus datos</h6>
+                <form id="form-datos-cliente">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre completo *</label>
+                            <input type="text" class="form-control" id="cliente-nombre" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Teléfono *</label>
+                            <input type="tel" class="form-control" id="cliente-telefono" 
+                                   placeholder="+56 9 1234 5678" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Comentarios adicionales</label>
+                        <textarea class="form-control" id="cliente-notas" rows="3" 
+                                  placeholder="Detalles específicos del corte, referencias, etc..."></textarea>
+                    </div>
+                </form>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Te contactaremos para confirmar tu cita vía WhatsApp
+                </div>
+            `;
+        }
+
+        // Generar contenido paso 3
+        function generarPaso3() {
+            const fecha = new Date(citaData.fecha);
+            const fechaFormateada = fecha.toLocaleDateString('es-CL', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            return `
+                <div class="text-center">
+                    <i class="bi bi-calendar-check text-success" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 mb-4">Resumen de tu cita</h4>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">SERVICIO</h6>
+                                <p class="fw-bold">${servicioSeleccionado.nombre}</p>
+                                
+                                <h6 class="text-muted mt-3">FECHA Y HORA</h6>
+                                <p class="fw-bold">${fechaFormateada}</p>
+                                <p class="fw-bold">${citaData.hora}</p>
+                                
+                                <h6 class="text-muted mt-3">BARBERO</h6>
+                                <p class="fw-bold">${citaData.barbero === 'empleado' ? 'Barbero Principal' : citaData.barbero === 'ewin' ? 'Ewin (Dueño)' : 'Sin preferencia'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">CLIENTE</h6>
+                                <p class="fw-bold">${citaData.nombreCliente}</p>
+                                <p>${citaData.telefonoCliente}</p>
+                                
+                                <h6 class="text-muted mt-3">PRECIO ESTIMADO</h6>
+                                <p class="h4 text-success">$${servicioSeleccionado.precio.toLocaleString()}</p>
+                                
+                                <h6 class="text-muted mt-3">DURACIÓN</h6>
+                                <p>${servicioSeleccionado.duracion} minutos</p>
+                            </div>
+                        </div>
+                        
+                        ${citaData.notas ? `
+                            <hr>
+                            <h6 class="text-muted">COMENTARIOS</h6>
+                            <p class="fst-italic">"${citaData.notas}"</p>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div class="alert alert-success mt-3">
+                    <i class="bi bi-whatsapp me-2"></i>
+                    Al confirmar, te redirigiremos a WhatsApp para finalizar tu agendamiento
+                </div>
+            `;
+        }
+
+        // Cargar horarios disponibles
+        function cargarHorarios() {
+            const fecha = document.getElementById('fecha-cita').value;
+            const barbero = document.getElementById('barbero-preferido').value;
+            
+            if (!fecha) return;
+            
+            // Simular horarios disponibles
+            const horarios = generarHorarios();
+            const container = document.getElementById('horarios-disponibles');
+            
+            container.innerHTML = horarios.map(horario => `
+                <div class="col-md-3 col-sm-4 col-6 mb-2">
+                    <div class="horario-slot ${horario.disponible ? '' : 'ocupado'}" 
+                         onclick="seleccionarHorario('${horario.hora}', ${horario.disponible})">
+                        <strong>${horario.hora}</strong>
+                        <br><small>${horario.disponible ? 'Disponible' : 'Ocupado'}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Generar horarios de ejemplo
+        function generarHorarios() {
+            const horarios = [];
+            for (let hora = 9; hora < 19; hora++) {
+                for (let minuto of ['00', '30']) {
+                    const horaStr = `${hora.toString().padStart(2, '0')}:${minuto}`;
+                    horarios.push({
+                        hora: horaStr,
+                        disponible: Math.random() > 0.3 // 70% de probabilidad de estar disponible
+                    });
+                }
+            }
+            return horarios;
+        }
+
+        // Seleccionar horario
+        function seleccionarHorario(hora, disponible) {
+            if (!disponible) return;
+            
+            // Remover selección anterior
+            document.querySelectorAll('.horario-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            // Seleccionar nuevo horario
+            event.target.closest('.horario-slot').classList.add('selected');
+            citaData.hora = hora;
+        }
+
+        // Navegación entre pasos
+        function pasoSiguiente() {
+            if (validarPasoActual()) {
+                if (citaData.paso < 3) {
+                    mostrarPaso(citaData.paso + 1);
+                } else {
+                    confirmarCita();
+                }
+            }
+        }
+
+        function pasoAnterior() {
+            if (citaData.paso > 1) {
+                mostrarPaso(citaData.paso - 1);
+            }
+        }
+
+        // Validar paso actual
+        function validarPasoActual() {
+            switch(citaData.paso) {
+                case 1:
+                    if (!citaData.hora) {
+                        alert('Por favor selecciona un horario');
+                        return false;
+                    }
+                    citaData.fecha = document.getElementById('fecha-cita').value;
+                    citaData.barbero = document.getElementById('barbero-preferido').value;
+                    return true;
+                    
+                case 2:
+                    const nombre = document.getElementById('cliente-nombre').value.trim();
+                    const telefono = document.getElementById('cliente-telefono').value.trim();
+                    
+                    if (!nombre || !telefono) {
+                        alert('Por favor completa todos los campos obligatorios');
+                        return false;
+                    }
+                    
+                    citaData.nombreCliente = nombre;
+                    citaData.telefonoCliente = telefono;
+                    citaData.notas = document.getElementById('cliente-notas').value.trim();
+                    return true;
+                    
+                case 3:
+                    return true;
+            }
+        }
+
+        // Confirmar cita y redirigir a WhatsApp
+        function confirmarCita() {
+            // Simular guardado en base de datos
+            console.log('Guardando cita:', citaData);
+            
+            // Generar mensaje de WhatsApp
+            const mensaje = generarMensajeWhatsApp();
+            const numeroWhatsApp = '56912345678'; // Número de la barbería
+            const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+            
+            // Mostrar confirmación y redirigir
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalAgendamiento'));
+            modal.hide();
+            
+            setTimeout(() => {
+                if (confirm('¿Deseas confirmar tu cita por WhatsApp ahora?')) {
+                    window.open(urlWhatsApp, '_blank');
+                }
+                mostrarMensajeExito();
+            }, 500);
+        }
+
+        // Generar mensaje de WhatsApp
+        function generarMensajeWhatsApp() {
+            const fecha = new Date(citaData.fecha);
+            const fechaFormateada = fecha.toLocaleDateString('es-CL');
+            
+            let mensaje = `🏠 *BARBERÍA NATWIN - SOLICITUD DE CITA*\n\n`;
+            mensaje += `👤 *Cliente:* ${citaData.nombreCliente}\n`;
+            mensaje += `📱 *Teléfono:* ${citaData.telefonoCliente}\n\n`;
+            mensaje += `✂️ *Servicio:* ${servicioSeleccionado.nombre}\n`;
+            mensaje += `💰 *Precio:* ${servicioSeleccionado.precio.toLocaleString()}\n`;
+            mensaje += `⏱️ *Duración:* ${servicioSeleccionado.duracion} min\n\n`;
+            mensaje += `📅 *Fecha solicitada:* ${fechaFormateada}\n`;
+            mensaje += `🕐 *Hora solicitada:* ${citaData.hora}\n`;
+            
+            if (citaData.barbero) {
+                const barberoNombre = citaData.barbero === 'empleado' ? 'Barbero Principal' : 'Ewin (Dueño)';
+                mensaje += `👨‍💼 *Barbero preferido:* ${barberoNombre}\n`;
+            }
+            
+            if (citaData.notas) {
+                mensaje += `📝 *Comentarios:* ${citaData.notas}\n`;
+            }
+            
+            mensaje += `\n¿Pueden confirmar esta cita? ¡Gracias! 😊`;
+            
+            return mensaje;
+        }
+
+        // Mostrar mensaje de éxito
+        function mostrarMensajeExito() {
+            const alertHTML = `
+                <div class="alert alert-success alert-dismissible fade show position-fixed" 
+                     style="top: 100px; right: 20px; z-index: 9999; min-width: 300px;">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <strong>¡Solicitud enviada!</strong> Te contactaremos pronto por WhatsApp.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHTML);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                const alert = document.querySelector('.alert-success');
+                if (alert) alert.remove();
+            }, 5000);
+        }
+
+        // Limpiar modal al cerrar
+        document.addEventListener('hidden.bs.modal', function (event) {
+            if (event.target.id === 'modalAgendamiento') {
+                event.target.remove();
+                servicioSeleccionado = null;
+                citaData = {};
+            }
+        });
+    </script>
+</body>
+</html>
