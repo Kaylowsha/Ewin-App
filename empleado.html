@@ -700,8 +700,11 @@ async function handleServiceSubmit(e) {
         // INICIALIZAR FIREBASE Y GUARDAR EN FIRESTORE
         initializeFirebase();
         await guardarServicioFirestore(formData);
+
+
+
+showServiceConfirmation(formData);
         
-        showServiceConfirmation(formData);
        await updateSummary();
         console.log('Servicio registrado:', formData);
     } catch (error) {
@@ -1110,8 +1113,8 @@ if (!Array.isArray(serviciosPeriodo)) {
                 const porcentajeTexto = comision === 1.0 ? '100%' : '50%';
                 
                 const editButton = currentUser.rol === 'administrador' ? 
-                    `<button class="btn btn-sm btn-outline-primary ms-2" onclick="editService('${servicio.id}')">
-                        <i class="bi bi-pencil"></i> Editar
+                    `<button class="btn btn-sm btn-outline-primary ms-2" onclick="deleteServiceForAdmin('${servicio.id}', '${currentUser.barbero}')"
+                        <i class="bi bi-trash"></i> Eliminar
                     </button>` : '';
                 
                 return `
@@ -1157,7 +1160,7 @@ function addAdminSection() {
                     </div>
                     <div class="row">
                             <div class="col-md-2 mb-3">
-                                <button class="btn btn-outline-primary w-100" onclick="showDashboardFinanciero()">
+                                <button class="btn btn-outline-danger w-100" onclick="showDashboardFinanciero()">
                                     <i class="bi bi-cash-stack me-2"></i>
                                     Dashboard Financiero
                                 </button>
@@ -1416,9 +1419,9 @@ function displayServicesListForAdmin(servicios, barberoId) {
                         <div class="fw-bold text-success">$${servicio.montoCobrado.toLocaleString()}</div>
                         <small class="text-muted">Total cobrado</small>
                         <div class="small text-primary">Su parte: $${miParte.toLocaleString()} (${porcentajeTexto})</div>
-                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="editServiceForAdmin('${servicio.id}', '${barberoId}')">
-                            <i class="bi bi-pencil"></i> Editar
-                        </button>
+                       <button class="btn btn-sm btn-outline-danger ms-2" onclick="deleteServiceForAdmin('${servicio.id}', '${barberoId}')">
+                      <i class="bi bi-trash"></i> Eliminar
+                      </button>
                     </div>
                 </div>
             </div>
@@ -1454,6 +1457,58 @@ function editServiceForAdmin(servicioId, barberoId) {
         updateComparativa();
         
         alert('✅ Monto actualizado');
+    }
+}
+
+// FUNCIÓN PARA ELIMINAR DE FIREBASE
+window.eliminarServicioFirestore = async function(servicioId) {
+    try {
+        if (!firebaseDB) {
+            initializeFirebase();
+        }
+        
+        // Eliminar directamente por document ID
+        await firebaseDB.collection('servicios').doc(servicioId).delete();
+        
+        console.log('Servicio eliminado de Firebase:', servicioId);
+        return true;
+        
+    } catch (error) {
+        console.error('Error eliminando servicio de Firebase:', error);
+        throw error;
+    }
+};
+// Función para eliminar servicio (solo admin)
+async function deleteServiceForAdmin(servicioId, barberoId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    try {
+        // Eliminar de Firebase (fuente principal)
+        await window.eliminarServicioFirestore(servicioId);
+        
+        // También eliminar del localStorage (limpieza local)
+        const todayKey = `servicios_${barberoId}_${new Date().toDateString()}`;
+        let servicios = JSON.parse(localStorage.getItem(todayKey) || '[]');
+        
+        const servicioIndex = servicios.findIndex(s => s.id === servicioId);
+        if (servicioIndex !== -1) {
+            servicios.splice(servicioIndex, 1);
+            localStorage.setItem(todayKey, JSON.stringify(servicios));
+        }
+        
+        // Actualizar la vista
+        updateSummaryForAdmin();
+        updateComparativa();
+        
+        alert('✅ Servicio eliminado correctamente del sistema');
+        // Forzar recarga de datos desde Firebase
+         location.reload();
+        
+    } catch (error) {
+        console.error('Error eliminando servicio:', error);
+        alert('❌ Error al eliminar: ' + error.message);
     }
 }
 // === DASHBOARD FINANCIERO COMPLETO ===
