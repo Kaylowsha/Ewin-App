@@ -1,0 +1,3602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barberia NatWin - Panel de Trabajo</title>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">  
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 30px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 16px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .nav-tabs .nav-link {
+            border-radius: 10px 10px 0 0;
+            border: none;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .service-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .service-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .price-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .period-tabs {
+            margin-bottom: 20px;
+        }
+        
+        .period-tabs .btn {
+            border-radius: 20px;
+            margin-right: 10px;
+            border: 2px solid #667eea;
+            color: #667eea;
+            background: transparent;
+        }
+        
+        .period-tabs .btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-scissors me-2"></i><strong>Barberia NatWin</strong>
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <span class="nav-link" id="welcomeText">
+                    <i class="bi bi-person-circle me-1"></i>Cargando...
+                </span>
+                <button class="btn btn-outline-primary btn-sm ms-2" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right me-1"></i>Cerrar Jornada
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mt-4">
+        <div class="main-container">
+            
+            <!-- Pestañas -->
+            <ul class="nav nav-tabs mb-4" id="mainTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="registro-tab" data-bs-toggle="tab" data-bs-target="#registro">
+                        <i class="bi bi-plus-circle me-2"></i>Registrar Servicio
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen">
+                        <i class="bi bi-graph-up me-2"></i>Mi Resumen
+                    </button>
+                </li>
+                <!-- Pestaña Admin (solo visible para Ewin) -->
+                <li class="nav-item" id="admin-tab-container" style="display: none;">
+                    <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin">
+                        <i class="bi bi-gear me-2"></i>Administración
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Contenido de las pestañas -->
+            <div class="tab-content" id="mainTabsContent">
+                
+                <!-- PESTAÑA 1: REGISTRAR SERVICIO -->
+                <div class="tab-pane fade show active" id="registro">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            
+                            <div class="card fade-in" id="serviceCard">
+                                <div class="card-header">
+                                    <h4 class="mb-0">
+                                        <i class="bi bi-clipboard-plus me-2"></i>
+                                        Nuevo Servicio
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    
+                                    <form id="serviceForm">
+                                        
+                                        <!-- Información del Barbero (Solo lectura) -->
+                                        <div class="mb-4">
+                                            <label class="form-label">
+                                                <i class="bi bi-person-check me-1 text-primary"></i>
+                                                Barbero
+                                            </label>
+                                            <div class="form-control bg-light" id="currentBarbero">
+                                                Cargando...
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Servicio Principal -->
+                                        <div class="mb-4">
+                                            <label for="servicioPrincipal" class="form-label">
+                                                <i class="bi bi-star-fill me-1 text-warning"></i>
+                                                Servicio Principal *
+                                            </label>
+                                            <select class="form-select" id="servicioPrincipal" required>
+                                                <option value="">Selecciona un servicio...</option>
+                                                <option value="corte-tradicional-estudiante">Corte Tradicional - Estudiante</option>
+                                                <option value="corte-tijera">Corte Tijera</option>
+                                                <option value="fade-degradados">Fade - Degradados</option>
+                                                <option value="barba-rasurado">Barba Rasurado</option>
+                                                <option value="perfilado-barba">Perfilado Barba</option>
+                                                <option value="barba-premium">Barba Premium</option>
+                                                <option value="rasurado-barba-vapor">Rasurado de Barba con Vapor</option>
+                                                <option value="limpieza-facial-premium">Limpieza Facial Premium</option>
+                                                <option value="servicio-full">Servicio Full</option>
+                                                <option value="cejas">Cejas</option>
+                                                <option value="disenos">Diseños</option>
+                                                <option value="lineas">Líneas</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Servicio Adicional -->
+                                        <div class="mb-4">
+                                            <label for="servicioAdicional" class="form-label">
+                                                <i class="bi bi-plus-circle me-1 text-info"></i>
+                                                Servicio Adicional (opcional)
+                                            </label>
+                                            <select class="form-select" id="servicioAdicional">
+                                                <option value="">Sin servicio adicional</option>
+                                                <option value="corte-tradicional-estudiante">Corte Tradicional - Estudiante</option>
+                                                <option value="corte-tijera">Corte Tijera</option>
+                                                <option value="fade-degradados">Fade - Degradados</option>
+                                                <option value="barba-rasurado">Barba Rasurado</option>
+                                                <option value="perfilado-barba">Perfilado Barba</option>
+                                                <option value="barba-premium">Barba Premium</option>
+                                                <option value="rasurado-barba-vapor">Rasurado de Barba con Vapor</option>
+                                                <option value="limpieza-facial-premium">Limpieza Facial Premium</option>
+                                                <option value="servicio-full">Servicio Full</option>
+                                                <option value="cejas">Cejas</option>
+                                                <option value="disenos">Diseños</option>
+                                                <option value="lineas">Líneas</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- NUEVO: Monto Cobrado -->
+                                        <div class="mb-4">
+                                            <label for="montoCobrado" class="form-label">
+                                                <i class="bi bi-cash-stack me-1 text-success"></i>
+                                                Monto Cobrado *
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       id="montoCobrado" 
+                                                       placeholder="Ingresa el monto cobrado"
+                                                       min="1000"
+                                                       step="500"
+                                                       required>
+                                            </div>
+                                            <small class="text-muted">Monto real que pagó el cliente</small>
+                                        </div>
+                                        
+                                        <!-- Vista previa del servicio -->
+                                        <div class="price-display" id="servicePreview" style="display: none;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-1">Resumen del Servicio</h6>
+                                                    <small class="text-muted" id="serviceDescription"></small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <h4 class="mb-0 text-success" id="previewAmount">$0</h4>
+                                                    <small class="text-muted">Monto a registrar</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Forma de Pago -->
+                                        <div class="mb-4">
+                                            <label for="formaPago" class="form-label">
+                                                <i class="bi bi-credit-card me-1 text-secondary"></i>
+                                                Forma de Pago *
+                                            </label>
+                                            <select class="form-select" id="formaPago" required>
+                                                <option value="">Selecciona forma de pago...</option>
+                                                <option value="efectivo">💵 Efectivo</option>
+                                                <option value="mercado-pago">💳 Mercado Pago</option>
+                                                <option value="cuenta-rut">🏦 Cuenta Rut</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Notas -->
+                                        <div class="mb-4">
+                                            <label for="notas" class="form-label">
+                                                <i class="bi bi-chat-text me-1 text-muted"></i>
+                                                Notas (opcional)
+                                            </label>
+                                            <textarea class="form-control" 
+                                                      id="notas" 
+                                                      rows="2" 
+                                                      placeholder="Observaciones adicionales..."></textarea>
+                                        </div>
+                                        
+                                        <!-- Botón de envío -->
+                                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            Registrar Servicio
+                                        </button>
+                                        
+                                    </form>
+                                    
+                                </div>
+                            </div>
+                            
+                            <!-- Mensaje de confirmación -->
+                            <div id="confirmationCard" class="card fade-in" style="display: none;">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                                    <h3 class="text-success mb-3">¡Servicio Registrado!</h3>
+                                    <div id="confirmationDetails" class="mb-4"></div>
+                                    <button class="btn btn-primary me-2" onclick="resetForm()">
+                                        <i class="bi bi-plus-circle me-2"></i>
+                                        Registrar Otro
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="goToSummary()">
+                                        <i class="bi bi-graph-up me-2"></i>
+                                        Ver Resumen
+                                    </button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PESTAÑA 2: MI RESUMEN -->
+                <div class="tab-pane fade" id="resumen">
+                    
+                    <!-- Selección de período -->
+                    <div class="period-tabs text-center mb-4">
+                        <button class="btn active" id="btn-dia" onclick="changePeriod('dia')">
+                            <i class="bi bi-calendar-day me-1"></i>Hoy
+                        </button>
+                        <button class="btn" id="btn-semana" onclick="changePeriod('semana')">
+                            <i class="bi bi-calendar-week me-1"></i>Esta Semana
+                        </button>
+                        <button class="btn" id="btn-mes" onclick="changePeriod('mes')">
+                            <i class="bi bi-calendar-month me-1"></i>Este Mes
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        
+                        <!-- Estadísticas principales (SOLO 3 CARDS) -->
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalRecaudado">$0</div>
+                                <div class="stat-label" id="labelRecaudado">Mi parte recaudada hoy</div>
+                              
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="stat-card">
+                                <div class="stat-number" id="serviciosPeriodo">0</div>
+                                <div class="stat-label" id="labelServicios">Servicios hoy</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="stat-card warning" id="adelantosCard">
+                                <div class="stat-number" id="adelantosPendientes">$0</div>
+                                <div class="stat-label">Adelantos pendientes</div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Resumen neto -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body text-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border-radius: 15px;">
+                                    <h3 class="mb-1">Total Neto: <span id="totalNeto">$0</span></h3>
+                                    <p class="mb-0 opacity-75" id="netoDescription">Mi parte menos adelantos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de servicios del período -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-list-check me-2"></i>
+                                        <span id="tituloServicios">Mis Servicios de Hoy</span>
+                                    </h5>
+                                    <span class="badge bg-primary" id="totalServiciosPeriodo">0 servicios</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="serviciosDelDia">
+                                        <div class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox display-4 mb-3"></i>
+                                            <button class="btn btn-primary" onclick="goToRegistro()">
+                                                <i class="bi bi-plus-circle me-2"></i>
+                                                Registrar Primer Servicio
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- PESTAÑA 3: ADMINISTRACIÓN (Solo para Ewin) -->
+                <div class="tab-pane fade" id="admin">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-gear me-2"></i>
+                                        Panel de Administración
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted">Funciones administrativas disponibles próximamente:</p>
+                                    <ul>
+                                        <li>Dashboard general de la barbería</li>
+                                        <li>Reportes de ingresos por barbero</li>
+                                        <li>Gestión de adelantos y pagos</li>
+                                        <li>Gestión de precios de servicios</li>
+                                        <li>Estadísticas avanzadas</li>
+                                        <li>Configuración del sistema</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Variables globales
+        let currentUser = null;
+        let serviciosDelDia = [];
+        let currentPeriod = 'dia';
+        
+        // Catálogo de servicios (nueva lista real)
+        const servicios = {
+            'corte-tradicional-estudiante': { nombre: 'Corte Tradicional - Estudiante' },
+            'corte-tijera': { nombre: 'Corte Tijera' },
+            'fade-degradados': { nombre: 'Fade - Degradados' },
+            'barba-rasurado': { nombre: 'Barba Rasurado' },
+            'perfilado-barba': { nombre: 'Perfilado Barba' },
+            'barba-premium': { nombre: 'Barba Premium' },
+            'rasurado-barba-vapor': { nombre: 'Rasurado de Barba con Vapor' },
+            'limpieza-facial-premium': { nombre: 'Limpieza Facial Premium' },
+            'servicio-full': { nombre: 'Servicio Full' },
+            'cejas': { nombre: 'Cejas' },
+            'disenos': { nombre: 'Diseños' },
+            'lineas': { nombre: 'Líneas' }
+        };
+        
+        // Elementos del DOM
+        const welcomeText = document.getElementById('welcomeText');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const serviceForm = document.getElementById('serviceForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const confirmationCard = document.getElementById('confirmationCard');
+        const serviceCard = document.getElementById('serviceCard');
+        
+        // Inicializar cuando la página cargue
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Panel de trabajo cargando...');
+            
+            // Verificar sesión
+            if (!checkSession()) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Configurar la interfaz según el usuario
+            setupInterface();
+            
+            // Cargar datos
+            loadAllData();
+            
+            // Configurar eventos
+            setupEventListeners();
+            
+            // Actualizar resúmenes
+           await updateSummary();
+        });
+        
+        // Verificar sesión activa
+        function checkSession() {
+            const session = localStorage.getItem('barberoSession');
+            if (!session) return false;
+            
+            try {
+                const sessionData = JSON.parse(session);
+                const today = new Date().toDateString();
+                
+                if (sessionData.date !== today) {
+                    localStorage.removeItem('barberoSession');
+                    return false;
+                }
+                
+                currentUser = {
+                    nombre: sessionData.nombre,
+                    barbero: sessionData.barbero,
+                    rol: sessionData.rol
+                };
+                
+                console.log(`Sesión activa: ${currentUser.nombre} (${currentUser.rol})`);
+                return true;
+                
+            } catch (e) {
+                localStorage.removeItem('barberoSession');
+                return false;
+            }
+        }
+        
+        // Configurar interfaz según el usuario
+        function setupInterface() {
+            const roleBadge = currentUser.rol === 'administrador' ? ' 👑' : '';
+            welcomeText.innerHTML = `<i class="bi bi-person-circle me-1"></i>${currentUser.nombre}${roleBadge}`;
+            
+            document.getElementById('currentBarbero').innerHTML = 
+                `<i class="bi bi-person-check me-2"></i>${currentUser.nombre}`;
+            
+            if (currentUser.rol === 'administrador') {
+                document.getElementById('admin-tab-container').style.display = 'block';
+                document.getElementById('currentBarbero').innerHTML = 
+                    `<i class="bi bi-person-check me-2"></i>${currentUser.nombre} - Administrador`;
+                console.log('🔧 Funciones de administrador habilitadas');
+            }
+        }
+        
+        // Configurar event listeners
+        function setupEventListeners() {
+            serviceForm.addEventListener('submit', handleServiceSubmit);
+            
+            // Vista previa del servicio
+            document.getElementById('servicioPrincipal').addEventListener('change', updateServicePreview);
+            document.getElementById('servicioAdicional').addEventListener('change', updateServicePreview);
+            document.getElementById('montoCobrado').addEventListener('input', updateServicePreview);
+            
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+        
+        // Cargar todos los datos
+        function loadAllData() {
+            loadTodayData();
+            loadAdelantos();
+        }
+        
+        // Cargar datos del día
+        function loadTodayData() {
+            const todayKey = `servicios_${currentUser.barbero}_${new Date().toDateString()}`;
+            const savedServices = localStorage.getItem(todayKey);
+            
+            if (savedServices) {
+                try {
+                    serviciosDelDia = JSON.parse(savedServices);
+                } catch (e) {
+                    serviciosDelDia = [];
+                }
+            }
+        }
+        
+        // Cargar adelantos
+        function loadAdelantos() {
+            // Por ahora simulamos adelantos - en el futuro esto vendrá de la base de datos
+            const adelantosKey = `adelantos_${currentUser.barbero}`;
+            const savedAdelantos = localStorage.getItem(adelantosKey);
+            
+            if (!savedAdelantos) {
+                // Simular algunos adelantos para demo
+                // No crear adelantos de demostración - empezar limpio
+const adelantosDemo = {
+    total: 0,
+    detalles: []
+};
+localStorage.setItem(adelantosKey, JSON.stringify(adelantosDemo));
+            }
+        }
+        
+        // Actualizar vista previa del servicio
+        function updateServicePreview() {
+            const principal = document.getElementById('servicioPrincipal').value;
+            const adicional = document.getElementById('servicioAdicional').value;
+            const monto = parseFloat(document.getElementById('montoCobrado').value) || 0;
+            
+            let descripcion = [];
+            
+            if (principal && servicios[principal]) {
+                descripcion.push(servicios[principal].nombre);
+            }
+            
+            if (adicional && servicios[adicional]) {
+                descripcion.push(servicios[adicional].nombre);
+            }
+            
+            if (descripcion.length > 0 && monto > 0) {
+                document.getElementById('servicePreview').style.display = 'block';
+                document.getElementById('serviceDescription').textContent = descripcion.join(' + ');
+                document.getElementById('previewAmount').textContent = `${monto.toLocaleString()}`;
+            } else {
+                document.getElementById('servicePreview').style.display = 'none';
+            }
+        }
+        
+        // Cambiar período de visualización
+        async function changePeriod(period) {
+            currentPeriod = period;
+            
+            // Actualizar botones
+            document.querySelectorAll('.period-tabs .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${period}`).classList.add('active');
+            
+            // Actualizar labels
+            const labels = {
+                'dia': { recaudado: 'Mi parte recaudada hoy', servicios: 'Servicios hoy', titulo: 'Mis Servicios de Hoy', neto: 'Mi parte hoy menos adelantos' },
+                'semana': { recaudado: 'Mi parte recaudada esta semana', servicios: 'Servicios esta semana', titulo: 'Mis Servicios de esta Semana', neto: 'Mi parte esta semana menos adelantos' },
+                'mes': { recaudado: 'Mi parte recaudada este mes', servicios: 'Servicios este mes', titulo: 'Mis Servicios de este Mes', neto: 'Mi parte este mes menos adelantos' }
+            };
+            
+            document.getElementById('labelRecaudado').textContent = labels[period].recaudado;
+            document.getElementById('labelServicios').textContent = labels[period].servicios;
+            document.getElementById('tituloServicios').textContent = labels[period].titulo;
+            document.getElementById('netoDescription').textContent = labels[period].neto;
+            
+           await updateSummary();
+        }
+        
+       // Manejar envío del formulario de servicio
+async function handleServiceSubmit(e) {
+    e.preventDefault();
+    const formData = getServiceFormData();
+    if (!validateServiceFormData(formData)) return;
+    setServiceLoading(true);
+    try {
+        await saveService(formData);
+        serviciosDelDia.push(formData);
+        const todayKey = `servicios_${currentUser.barbero}_${new Date().toDateString()}`;
+        
+        // INICIALIZAR FIREBASE Y GUARDAR EN FIRESTORE
+        initializeFirebase();
+        await guardarServicioFirestore(formData);
+
+
+
+showServiceConfirmation(formData);
+        
+       await updateSummary();
+        console.log('Servicio registrado:', formData);
+    } catch (error) {
+        alert('Error al registrar servicio: ' + error.message);
+    }
+    setServiceLoading(false);
+}
+        
+        // Obtener datos del formulario de servicio
+        function getServiceFormData() {
+            const principal = document.getElementById('servicioPrincipal').value;
+            const adicional = document.getElementById('servicioAdicional').value;
+            const montoCobrado = parseFloat(document.getElementById('montoCobrado').value);
+            
+            const serviciosSeleccionados = [servicios[principal].nombre];
+            if (adicional) serviciosSeleccionados.push(servicios[adicional].nombre);
+            
+            return {
+                id: Date.now().toString(),
+                barbero: currentUser.nombre,
+                servicios: serviciosSeleccionados,
+                montoCobrado: montoCobrado,
+                formaPago: document.getElementById('formaPago').value,
+                formaPagoTexto: document.getElementById('formaPago').options[document.getElementById('formaPago').selectedIndex].text,
+                notas: document.getElementById('notas').value.trim() || null,
+                fecha: new Date(),
+                fechaTexto: new Date().toLocaleString('es-CL')
+            };
+        }
+        
+        // Validar datos del formulario de servicio
+        function validateServiceFormData(data) {
+            if (!data.servicios.length) {
+                alert('Debes seleccionar al menos un servicio');
+                return false;
+            }
+            
+            if (!data.montoCobrado || data.montoCobrado <= 0) {
+                alert('Debes ingresar un monto válido');
+                return false;
+            }
+            
+            if (!data.formaPago) {
+                alert('Debes seleccionar una forma de pago');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Guardar servicio (simulado)
+        async function saveService(data) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return true;
+        }
+        
+        // Mostrar confirmación de servicio
+        function showServiceConfirmation(data) {
+            const serviciosList = data.servicios.join(' + ');
+            
+            document.getElementById('confirmationDetails').innerHTML = `
+                <div class="text-start">
+                    <p><strong>Barbero:</strong> ${data.barbero}</p>
+                    <p><strong>Servicios:</strong> ${serviciosList}</p>
+                    <p><strong>Monto cobrado:</strong> ${data.montoCobrado.toLocaleString()}</p>
+                    <p><strong>Forma de pago:</strong> ${data.formaPagoTexto}</p>
+                    ${data.notas ? `<p><strong>Notas:</strong> ${data.notas}</p>` : ''}
+                </div>
+            `;
+            
+            serviceCard.style.display = 'none';
+            confirmationCard.style.display = 'block';
+        }
+        
+        // Resetear formulario de servicio
+        function resetForm() {
+            serviceForm.reset();
+            document.getElementById('servicePreview').style.display = 'none';
+            confirmationCard.style.display = 'none';
+            serviceCard.style.display = 'block';
+        }
+        
+        // Ir a pestaña resumen
+        function goToSummary() {
+            document.getElementById('resumen-tab').click();
+        }
+        
+        // Ir a pestaña registro
+        function goToRegistro() {
+            document.getElementById('registro-tab').click();
+        }
+        
+        // Mostrar estado de carga del servicio
+        function setServiceLoading(loading) {
+            if (loading) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise loading-spinner me-2"></i>Guardando...';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Registrar Servicio';
+            }
+        }
+        
+     // 2. Obtener servicios del período seleccionado - VERSIÓN FIRESTORE
+async function getServiciosPorPeriodo(period) {
+    try {
+        // Inicializar Firebase si no está inicializado
+        if (!firebaseDB) {
+            initializeFirebase();
+        }
+        
+        // Obtener todos los servicios de Firestore
+        const servicios = await obtenerServiciosFirestore();
+        
+        // Filtrar por barbero actual
+        const serviciosFiltrados = servicios.filter(s => s.barbero === currentUser.nombre);
+        
+        // Filtrar por período
+        const ahora = new Date();
+        const inicioSemana = new Date(ahora);
+        inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+        const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        return serviciosFiltrados.filter(servicio => {
+            const fechaServicio = new Date(servicio.fecha);
+            fechaServicio.setHours(0, 0, 0, 0);
+            
+            switch (period) {
+                case 'dia':
+                    return fechaServicio.getTime() === hoy.getTime();
+                case 'semana':
+                    return fechaServicio >= inicioSemana;
+                case 'mes':
+                    return fechaServicio >= inicioMes;
+                default:
+                    return false;
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error obteniendo servicios por período:', error);
+        return [];
+    }
+}
+        
+        // Obtener adelantos pendientes
+        function getAdelantosPendientes() {
+            const adelantosKey = `adelantos_${currentUser.barbero}`;
+            const savedAdelantos = localStorage.getItem(adelantosKey);
+            
+            if (savedAdelantos) {
+                try {
+                    const adelantos = JSON.parse(savedAdelantos);
+                    return adelantos.total || 0;
+                } catch (e) {
+                    return 0;
+                }
+            }
+            return 0;
+        }
+        
+        // FUNCIÓN LIMPIA SIN REFERENCIAS A ELEMENTOS INEXISTENTES
+        async function updateSummary() {
+let serviciosPeriodo = await getServiciosPorPeriodo(currentPeriod);
+console.log('🔍 DEBUG serviciosPeriodo:', serviciosPeriodo, typeof serviciosPeriodo);
+
+// PROTECCIÓN: Si no es un array, usar array vacío
+if (!Array.isArray(serviciosPeriodo)) {
+    console.log('❌ serviciosPeriodo no es array, usando array vacío');
+    serviciosPeriodo = [];
+}
+            console.log('🔍 DEBUG serviciosPeriodo:', serviciosPeriodo, typeof serviciosPeriodo);
+            const totalCobrado = serviciosPeriodo.reduce((sum, s) => sum + s.montoCobrado, 0);
+            const miParte = totalCobrado * 0.5; // 50% del total cobrado
+            const adelantos = getAdelantosPendientes();
+            const totalNeto = miParte - adelantos;
+            
+            // SOLO actualizar elementos que EXISTEN en el HTML
+            document.getElementById('totalRecaudado').textContent = `${miParte.toLocaleString()}`;
+            document.getElementById('serviciosPeriodo').textContent = serviciosPeriodo.length;
+            document.getElementById('adelantosPendientes').textContent = `${adelantos.toLocaleString()}`;
+            document.getElementById('totalNeto').textContent = `${totalNeto.toLocaleString()}`;
+            document.getElementById('totalServiciosPeriodo').textContent = `${serviciosPeriodo.length} servicios`;
+            
+            // Cambiar color del total neto
+            const netoElement = document.querySelector('#totalNeto').parentElement.parentElement.parentElement.firstElementChild;
+            if (totalNeto < 0) {
+                netoElement.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+            } else {
+                netoElement.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            }
+            
+            // Mostrar lista de servicios
+            displayServicesList(serviciosPeriodo);
+        }
+        
+        // Mostrar lista de servicios
+        function displayServicesList(servicios) {
+            const container = document.getElementById('serviciosDelDia');
+            
+            if (servicios.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox display-4 mb-3"></i>
+                        <p>No hay servicios registrados en este período</p>
+                        <button class="btn btn-primary" onclick="goToRegistro()">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Registrar Primer Servicio
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Ordenar por fecha más reciente
+            servicios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            
+            container.innerHTML = servicios.map((servicio, index) => {
+                const serviciosList = servicio.servicios.join(' + ');
+                const fechaFormateada = new Date(servicio.fecha).toLocaleDateString('es-CL', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                return `
+                    <div class="service-item fade-in">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="service-number me-3">${index + 1}</span>
+                                <div>
+                                    <h6 class="mb-1">${serviciosList}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>${fechaFormateada}
+                                        <i class="bi bi-credit-card ms-2 me-1"></i>${servicio.formaPagoTexto}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">${servicio.montoCobrado.toLocaleString()}</div>
+                                <small class="text-muted">Total cobrado</small>
+                                <div class="small text-primary">Mi parte: ${(servicio.montoCobrado * 0.5).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Manejar logout
+        function handleLogout() {
+            const jornada = currentUser.rol === 'administrador' ? 'sesión' : 'jornada';
+            if (confirm(`¿Estás seguro que deseas cerrar tu ${jornada}?`)) {
+                localStorage.removeItem('barberoSession');
+                console.log(`${currentUser.nombre} cerró su ${jornada}`);
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // === NUEVAS FUNCIONES ADMINISTRATIVAS (LAS 3 PRINCIPALES) ===
+        
+        // FUNCIÓN CLAVE: Comisión según rol
+        function getComision(rol) {
+            return rol === 'administrador' ? 1.0 : 0.5; // Ewin 100%, Empleado 50%
+        }
+        
+        // Modificar función existente updateServicePreview
+        const originalUpdateServicePreview = updateServicePreview;
+        updateServicePreview = function() {
+            const principal = document.getElementById('servicioPrincipal').value;
+            const adicional = document.getElementById('servicioAdicional').value;
+            const monto = parseFloat(document.getElementById('montoCobrado').value) || 0;
+            
+            let descripcion = [];
+            
+            if (principal && servicios[principal]) {
+                descripcion.push(servicios[principal].nombre);
+            }
+            
+            if (adicional && servicios[adicional]) {
+                descripcion.push(servicios[adicional].nombre);
+            }
+            
+            if (descripcion.length > 0 && monto > 0) {
+                const comision = getComision(currentUser.rol);
+                const miParte = monto * comision;
+                const porcentajeTexto = comision === 1.0 ? '100%' : '50%';
+                
+                document.getElementById('servicePreview').style.display = 'block';
+                document.getElementById('serviceDescription').textContent = descripcion.join(' + ');
+                document.getElementById('previewAmount').textContent = `$${monto.toLocaleString()}`;
+                
+                // Agregar línea de comisión si no existe
+                let comisionElement = document.getElementById('previewComision');
+                if (!comisionElement) {
+                    comisionElement = document.createElement('div');
+                    comisionElement.id = 'previewComision';
+                    comisionElement.className = 'small text-primary mt-1';
+                    document.querySelector('#servicePreview .text-end').appendChild(comisionElement);
+                }
+                comisionElement.textContent = `Mi parte: $${miParte.toLocaleString()} (${porcentajeTexto})`;
+            } else {
+                document.getElementById('servicePreview').style.display = 'none';
+            }
+        };
+        
+        // Función 1: Comparativa entre barberos (SIMPLIFICADA)
+        function updateComparativa() {
+            if (currentUser.rol !== 'administrador') return;
+            
+            const barberos = ['empleado', 'ewin'];
+            const barberosData = [];
+            const today = new Date().toDateString();
+            
+            barberos.forEach(barberoId => {
+                const serviciosKey = `servicios_${barberoId}_${today}`;
+                const servicios = JSON.parse(localStorage.getItem(serviciosKey) || '[]');
+                
+                const totalCobrado = servicios.reduce((sum, s) => sum + s.montoCobrado, 0);
+                const comision = barberoId === 'ewin' ? 1.0 : 0.5;
+                const miParte = servicios.reduce((sum, s) => sum + (s.montoCobrado * comision), 0);
+                
+                barberosData.push({
+                    id: barberoId,
+                    nombre: barberoId === 'ewin' ? 'Ewin 👑' : 'Barbero',
+                    totalCobrado,
+                    miParte,
+                    servicios: servicios.length
+                });
+            });
+            
+            console.log('📊 Comparativa:', barberosData);
+        }
+        
+        // Función 2: Editar servicios (SIMPLIFICADA)
+        async function editService(servicioId) {
+            if (currentUser.rol !== 'administrador') return;
+            
+            const nuevoMonto = prompt('Nuevo monto:', '');
+            if (!nuevoMonto || isNaN(nuevoMonto)) return;
+            
+            const monto = parseFloat(nuevoMonto);
+            if (monto < 1000) {
+                alert('Monto mínimo: $1.000');
+                return;
+            }
+            
+            // Buscar y actualizar en servicios del día actual
+            const todayKey = `servicios_${currentUser.barbero}_${new Date().toDateString()}`;
+            let servicios = JSON.parse(localStorage.getItem(todayKey) || '[]');
+            
+            const servicioIndex = servicios.findIndex(s => s.id === servicioId);
+            if (servicioIndex !== -1) {
+                const comision = getComision(currentUser.rol);
+                servicios[servicioIndex].montoCobrado = monto;
+                servicios[servicioIndex].miParte = monto * comision;
+                
+                localStorage.setItem(todayKey, JSON.stringify(servicios));
+                
+                // Actualizar datos globales
+                serviciosDelDia = servicios;
+               await updateSummary();
+                updateComparativa();
+                
+                alert('✅ Monto actualizado');
+            }
+        }
+        
+        // Modificar displayServicesList para agregar botón editar
+        const originalDisplayServicesList = displayServicesList;
+        displayServicesList = function(servicios) {
+            const container = document.getElementById('serviciosDelDia');
+            
+            if (servicios.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox display-4 mb-3"></i>
+                        <p>No hay servicios registrados en este período</p>
+                        <button class="btn btn-primary" onclick="goToRegistro()">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Registrar Primer Servicio
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            servicios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            
+            container.innerHTML = servicios.map((servicio, index) => {
+                const serviciosList = servicio.servicios.join(' + ');
+                const fechaFormateada = new Date(servicio.fecha).toLocaleDateString('es-CL', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const comision = getComision(currentUser.rol);
+                const miParte = servicio.miParte || (servicio.montoCobrado * comision);
+                const porcentajeTexto = comision === 1.0 ? '100%' : '50%';
+                
+                const editButton = currentUser.rol === 'administrador' ? 
+                    `<button class="btn btn-sm btn-outline-primary ms-2" onclick="deleteServiceForAdmin('${servicio.id}', '${currentUser.barbero}')"
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>` : '';
+                
+                return `
+                    <div class="service-item fade-in">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="service-number me-3">${index + 1}</span>
+                                <div>
+                                    <h6 class="mb-1">${serviciosList}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>${fechaFormateada}
+                                        <i class="bi bi-credit-card ms-2 me-1"></i>${servicio.formaPagoTexto}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">$${servicio.montoCobrado.toLocaleString()}</div>
+                                <small class="text-muted">Total cobrado</small>
+                                <div class="small text-primary">Mi parte: $${miParte.toLocaleString()} (${porcentajeTexto})</div>
+                                ${editButton}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+        
+        // Función 3: Agregar sección admin al HTML dinámicamente
+// Función 3: Agregar sección admin al HTML dinámicamente
+// Función 3: Agregar sección admin al HTML dinámicamente
+function addAdminSection() {
+    if (currentUser.rol !== 'administrador') return;
+    
+    const adminContent = `
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card" style="border-left: 4px solid #ffc107; background: linear-gradient(135deg, #fff3cd, #fff8dc);">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-crown me-2 text-warning"></i>
+                            Panel de Administración
+                        </h5>
+                    </div>
+                    <div class="row">
+                            <div class="col-md-2 mb-3">
+                                <button class="btn btn-outline-danger w-100" onclick="showDashboardFinanciero()">
+                                    <i class="bi bi-cash-stack me-2"></i>
+                                    Dashboard Financiero
+                                </button>
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <button class="btn btn-outline-success w-100" onclick="toggleViewMode()">
+                                    <i class="bi bi-eye me-2"></i>
+                                    <span id="viewModeText">Ver Servicios del Empleado</span>
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="btn btn-outline-danger w-100" onclick="showAdelantosManager()">
+                                    <i class="bi bi-cash-coin me-2"></i>
+                                    Gestionar Adelantos
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="btn btn-outline-info w-100" onclick="showCierreCaja()">
+                                    <i class="bi bi-calculator me-2"></i>
+                                    Cierre de Caja
+                                </button>
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <button class="btn btn-outline-warning w-100" onclick="showEstadisticasServicios()">
+                                    <i class="bi bi-graph-up me-2"></i>
+                                    Estadísticas
+                                </button>
+                            </div>
+                        </div>
+                        <div id="adminResults" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.querySelector('#resumen').insertAdjacentHTML('beforeend', adminContent);
+}
+        
+        function showComparativa() {
+            const barberos = ['empleado', 'ewin'];
+            const today = new Date().toDateString();
+            let html = '<h6>📊 Comparativa de Hoy:</h6>';
+            
+            barberos.forEach(barberoId => {
+                const serviciosKey = `servicios_${barberoId}_${today}`;
+                const servicios = JSON.parse(localStorage.getItem(serviciosKey) || '[]');
+                
+                const totalCobrado = servicios.reduce((sum, s) => sum + s.montoCobrado, 0);
+                const comision = barberoId === 'ewin' ? 1.0 : 0.5;
+                const miParte = totalCobrado * comision;
+                const nombre = barberoId === 'ewin' ? 'Ewin 👑' : 'Barbero';
+                
+                html += `
+                    <div class="alert alert-info">
+                        <strong>${nombre}:</strong> 
+                        ${servicios.length} servicios | 
+                        Total: $${totalCobrado.toLocaleString()} | 
+                        Su parte: $${miParte.toLocaleString()} (${comision === 1.0 ? '100%' : '50%'})
+                    </div>
+                `;
+            });
+            
+            document.getElementById('adminResults').innerHTML = html;
+        }
+        
+        function generateReport() {
+            const today = new Date().toDateString();
+            const data = {
+                fecha: today,
+                barberos: {}
+            };
+            
+            ['empleado', 'ewin'].forEach(barberoId => {
+                const serviciosKey = `servicios_${barberoId}_${today}`;
+                const servicios = JSON.parse(localStorage.getItem(serviciosKey) || '[]');
+                
+                data.barberos[barberoId] = {
+                    nombre: barberoId === 'ewin' ? 'Ewin' : 'Barbero',
+                    servicios: servicios.length,
+                    totalCobrado: servicios.reduce((sum, s) => sum + s.montoCobrado, 0),
+                    miParte: servicios.reduce((sum, s) => sum + (s.montoCobrado * (barberoId === 'ewin' ? 1.0 : 0.5)), 0)
+                };
+            });
+            
+            console.log('📋 Reporte generado:', data);
+            alert('📋 Reporte generado (ver consola)');
+        }
+        // Variables para el modo de visualización del admin
+let adminViewMode = 'ewin'; // 'ewin' o 'empleado'
+
+// Función para cambiar entre ver servicios propios y del empleado
+function toggleViewMode() {
+    if (adminViewMode === 'ewin') {
+        adminViewMode = 'empleado';
+        document.getElementById('viewModeText').textContent = 'Ver Mis Servicios';
+        document.getElementById('tituloServicios').textContent = 'Servicios del Empleado';
+        
+        // Cambiar currentUser temporalmente para cargar datos del empleado
+        const originalBarbero = currentUser.barbero;
+        currentUser.barbero = 'empleado';
+        updateSummaryForAdmin();
+        currentUser.barbero = originalBarbero;
+        
+    } else {
+        adminViewMode = 'ewin';
+        document.getElementById('viewModeText').textContent = 'Ver Servicios del Empleado';
+        document.getElementById('tituloServicios').textContent = 'Mis Servicios de Hoy';
+        updateSummaryForAdmin();
+    }
+}
+
+// Función especial de resumen para admin que puede ver ambos barberos
+async function updateSummaryForAdmin() {
+    const barberoAVer = adminViewMode === 'ewin' ? 'ewin' : 'empleado';
+    let serviciosPeriodo = await getServiciosByBarbero(barberoAVer, 'dia');
+console.log('🔍 DEBUG serviciosPeriodo ADMIN:', serviciosPeriodo, typeof serviciosPeriodo);
+
+// PROTECCIÓN: Si no es un array, usar array vacío
+if (!Array.isArray(serviciosPeriodo)) {
+    console.log('❌ serviciosPeriodo ADMIN no es array, usando array vacío');
+    serviciosPeriodo = [];
+}
+    // Calcular comisión según el barbero que estamos viendo
+    const comision = barberoAVer === 'ewin' ? 1.0 : 0.5;
+    const miParte = serviciosPeriodo.reduce((sum, s) => {
+        return sum + (s.miParte || (s.montoCobrado * comision));
+    }, 0);
+    
+    // Adelantos del barbero específico
+    const adelantosKey = `adelantos_${barberoAVer}`;
+    const savedAdelantos = localStorage.getItem(adelantosKey);
+    let adelantos = 0;
+    if (savedAdelantos) {
+        try {
+            const adelantosData = JSON.parse(savedAdelantos);
+            adelantos = adelantosData.total || 0;
+        } catch (e) {
+            adelantos = 0;
+        }
+    }
+    
+    const totalNeto = miParte - adelantos;
+    
+    // Actualizar la interfaz
+    document.getElementById('totalRecaudado').textContent = `$${miParte.toLocaleString()}`;
+    document.getElementById('serviciosPeriodo').textContent = serviciosPeriodo.length;
+    document.getElementById('adelantosPendientes').textContent = `$${adelantos.toLocaleString()}`;
+    document.getElementById('totalNeto').textContent = `$${totalNeto.toLocaleString()}`;
+    document.getElementById('totalServiciosPeriodo').textContent = `${serviciosPeriodo.length} servicios`;
+    
+    // Cambiar color del total neto
+    const netoElement = document.querySelector('#totalNeto').parentElement.parentElement.parentElement.firstElementChild;
+    if (totalNeto < 0) {
+        netoElement.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+    } else {
+        netoElement.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+    }
+    
+    // Mostrar servicios con capacidad de editar
+    displayServicesListForAdmin(serviciosPeriodo, barberoAVer);
+}
+// 1. Función para obtener servicios de cualquier barbero - VERSIÓN FIRESTORE
+async function getServiciosByBarbero(barberoId, period) {
+    try {
+        // Inicializar Firebase si no está inicializado
+        if (!firebaseDB) {
+            initializeFirebase();
+        }
+        
+        // Obtener todos los servicios de Firestore
+        const servicios = await obtenerServiciosFirestore();
+        
+        // Filtrar por barbero
+        const barberoNombre = barberoId === 'ewin' ? 'Ewin' : 'Empleado';
+        let serviciosFiltrados = servicios.filter(s => s.barbero === barberoNombre);
+        
+        // Filtrar por período
+        const ahora = new Date();
+        const inicioSemana = new Date(ahora);
+        inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+        const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        return serviciosFiltrados.filter(servicio => {
+            const fechaServicio = new Date(servicio.fecha);
+            fechaServicio.setHours(0, 0, 0, 0);
+            
+            switch (period) {
+                case 'dia':
+                    return fechaServicio.getTime() === hoy.getTime();
+                case 'semana':
+                    return fechaServicio >= inicioSemana;
+                case 'mes':
+                    return fechaServicio >= inicioMes;
+                default:
+                    return false;
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error obteniendo servicios por barbero:', error);
+        return [];
+    }
+}
+
+
+
+// Función especial para mostrar servicios que el admin puede editar
+function displayServicesListForAdmin(servicios, barberoId) {
+    const container = document.getElementById('serviciosDelDia');
+    
+    if (servicios.length === 0) {
+        const nombreBarbero = barberoId === 'ewin' ? 'tuyo' : 'del empleado';
+        container.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-inbox display-4 mb-3"></i>
+                <p>No hay servicios ${nombreBarbero} registrados en este período</p>
+            </div>
+        `;
+        return;
+    }
+    
+    servicios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    container.innerHTML = servicios.map((servicio, index) => {
+        const serviciosList = servicio.servicios.join(' + ');
+        const fechaFormateada = new Date(servicio.fecha).toLocaleDateString('es-CL', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const comision = barberoId === 'ewin' ? 1.0 : 0.5;
+        const miParte = servicio.miParte || (servicio.montoCobrado * comision);
+        const porcentajeTexto = comision === 1.0 ? '100%' : '50%';
+        
+        return `
+            <div class="service-item fade-in">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <span class="service-number me-3">${index + 1}</span>
+                        <div>
+                            <h6 class="mb-1">${serviciosList}</h6>
+                            <small class="text-muted">
+                                <i class="bi bi-person me-1"></i>${servicio.barbero}
+                                <i class="bi bi-clock ms-2 me-1"></i>${fechaFormateada}
+                                <i class="bi bi-credit-card ms-2 me-1"></i>${servicio.formaPagoTexto}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-success">$${servicio.montoCobrado.toLocaleString()}</div>
+                        <small class="text-muted">Total cobrado</small>
+                        <div class="small text-primary">Su parte: $${miParte.toLocaleString()} (${porcentajeTexto})</div>
+                       <button class="btn btn-sm btn-outline-danger ms-2" onclick="deleteServiceForAdmin('${servicio.id}', '${barberoId}')">
+                      <i class="bi bi-trash"></i> Eliminar
+                      </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Función mejorada para editar servicios de cualquier barbero
+function editServiceForAdmin(servicioId, barberoId) {
+    const nuevoMonto = prompt('Nuevo monto:', '');
+    if (!nuevoMonto || isNaN(nuevoMonto)) return;
+    
+    const monto = parseFloat(nuevoMonto);
+    if (monto < 1000) {
+        alert('Monto mínimo: $1.000');
+        return;
+    }
+    
+    // Buscar y actualizar en servicios del barbero específico
+    const todayKey = `servicios_${barberoId}_${new Date().toDateString()}`;
+    let servicios = JSON.parse(localStorage.getItem(todayKey) || '[]');
+    
+    const servicioIndex = servicios.findIndex(s => s.id === servicioId);
+    if (servicioIndex !== -1) {
+        const comision = barberoId === 'ewin' ? 1.0 : 0.5;
+        servicios[servicioIndex].montoCobrado = monto;
+        servicios[servicioIndex].miParte = monto * comision;
+        
+        localStorage.setItem(todayKey, JSON.stringify(servicios));
+        
+        // Actualizar la vista
+        updateSummaryForAdmin();
+        updateComparativa();
+        
+        alert('✅ Monto actualizado');
+    }
+}
+
+// FUNCIÓN PARA ELIMINAR DE FIREBASE
+window.eliminarServicioFirestore = async function(servicioId) {
+    try {
+        if (!firebaseDB) {
+            initializeFirebase();
+        }
+        
+        // Eliminar directamente por document ID
+        await firebaseDB.collection('servicios').doc(servicioId).delete();
+        
+        console.log('Servicio eliminado de Firebase:', servicioId);
+        return true;
+        
+    } catch (error) {
+        console.error('Error eliminando servicio de Firebase:', error);
+        throw error;
+    }
+};
+// Función para eliminar servicio (solo admin)
+async function deleteServiceForAdmin(servicioId, barberoId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    try {
+        // Eliminar de Firebase (fuente principal)
+        await window.eliminarServicioFirestore(servicioId);
+        
+        // También eliminar del localStorage (limpieza local)
+        const todayKey = `servicios_${barberoId}_${new Date().toDateString()}`;
+        let servicios = JSON.parse(localStorage.getItem(todayKey) || '[]');
+        
+        const servicioIndex = servicios.findIndex(s => s.id === servicioId);
+        if (servicioIndex !== -1) {
+            servicios.splice(servicioIndex, 1);
+            localStorage.setItem(todayKey, JSON.stringify(servicios));
+        }
+        
+        // Actualizar la vista
+        updateSummaryForAdmin();
+        updateComparativa();
+        
+        alert('✅ Servicio eliminado correctamente del sistema');
+        // Forzar recarga de datos desde Firebase
+         location.reload();
+        
+    } catch (error) {
+        console.error('Error eliminando servicio:', error);
+        alert('❌ Error al eliminar: ' + error.message);
+    }
+}
+// === DASHBOARD FINANCIERO COMPLETO ===
+
+// Mostrar dashboard financiero principal
+function showDashboardFinanciero() {
+    const periodos = ['dia', 'semana', 'mes'];
+    let html = `
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Dashboard Financiero - Control de Caja
+                </h6>
+            </div>
+            <div class="card-body">
+                <!-- Selector de período -->
+                <div class="mb-4 text-center">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-primary active" onclick="updateDashboardFinanciero('dia')" id="dash-dia">
+                            Hoy
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="updateDashboardFinanciero('semana')" id="dash-semana">
+                            Esta Semana
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="updateDashboardFinanciero('mes')" id="dash-mes">
+                            Este Mes
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="dashboardContent">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('adminResults').innerHTML = html;
+    updateDashboardFinanciero('dia');
+}
+
+// Actualizar dashboard financiero según período
+async function updateDashboardFinanciero(periodo) {
+    // Actualizar botones activos
+    document.querySelectorAll('#adminResults .btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`dash-${periodo}`).classList.add('active');
+    
+    // Calcular datos financieros
+    const datosFinancieros = await calcularDatosFinancieros(periodo);
+    
+    const html = `
+        <!-- RESUMEN EJECUTIVO -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card border-success">
+                    <div class="card-body text-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                        <i class="bi bi-cash-stack display-6 mb-2"></i>
+                        <h4>$${datosFinancieros.totalBruto.toLocaleString()}</h4>
+                        <small>Total Bruto Generado</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card border-danger">
+                    <div class="card-body text-center" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white;">
+                        <i class="bi bi-arrow-down-circle display-6 mb-2"></i>
+                        <h4>$${datosFinancieros.totalAdelantos.toLocaleString()}</h4>
+                        <small>Adelantos Dados</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card border-primary">
+                    <div class="card-body text-center" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white;">
+                        <i class="bi bi-wallet2 display-6 mb-2"></i>
+                        <h4>$${datosFinancieros.totalNeto.toLocaleString()}</h4>
+                        <small>A Pagar (Neto)</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card border-info">
+                    <div class="card-body text-center" style="background: linear-gradient(135deg, #17a2b8, #138496); color: white;">
+                        <i class="bi bi-safe display-6 mb-2"></i>
+                        <h4>$${datosFinancieros.efectivoEnCaja.toLocaleString()}</h4>
+                        <small>Efectivo en Caja</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DESGLOSE POR BARBERO -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">💰 Desglose por Barbero</h6>
+                    </div>
+                    <div class="card-body">
+                        ${datosFinancieros.barberos.map(barbero => `
+                            <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                <div>
+                                    <strong>${barbero.nombre}</strong>
+                                    <div class="small text-muted">${barbero.servicios} servicios</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-success">$${barbero.totalCobrado.toLocaleString()}</div>
+                                    <div class="small text-primary">Su parte: $${barbero.suParte.toLocaleString()} (${barbero.comision === 1.0 ? '100%' : '50%'})</div>
+                                    ${barbero.adelantos > 0 ? `<div class="small text-danger">Adelantos: $${barbero.adelantos.toLocaleString()}</div>` : ''}
+                                    <div class="small text-info fw-bold">Neto: $${barbero.neto.toLocaleString()}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">📋 Adelantos Recientes</h6>
+                    </div>
+                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                        ${datosFinancieros.adelantosRecientes.length === 0 ? 
+                            '<p class="text-muted text-center">No hay adelantos en este período</p>' :
+                            datosFinancieros.adelantosRecientes.map(adelanto => `
+                                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-start border-warning border-3">
+                                    <div>
+                                        <strong>${adelanto.barberoNombre}</strong>
+                                        <div class="small text-muted">${adelanto.motivo}</div>
+                                        <div class="small text-muted">${adelanto.fechaTexto}</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold text-danger">$${adelanto.monto.toLocaleString()}</div>
+                                        <span class="badge bg-${adelanto.estado === 'liquidado' ? 'success' : 'warning'}">${adelanto.estado === 'liquidado' ? 'Descontado' : 'Pendiente'}</span>
+                                    </div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONTROL DE CAJA -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">💳 Control de Caja y Transferencias</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <i class="bi bi-cash display-4 text-success mb-2"></i>
+                                    <h5>$${datosFinancieros.formasPago.efectivo.toLocaleString()}</h5>
+                                    <small class="text-muted">Efectivo Cobrado</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <i class="bi bi-credit-card display-4 text-primary mb-2"></i>
+                                    <h5>$${datosFinancieros.formasPago.mercadoPago.toLocaleString()}</h5>
+                                    <small class="text-muted">Mercado Pago</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <i class="bi bi-bank display-4 text-info mb-2"></i>
+                                    <h5>$${datosFinancieros.formasPago.cuentaRut.toLocaleString()}</h5>
+                                    <small class="text-muted">Cuenta Rut</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h6>📊 Resumen de Movimientos:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>💰 Dinero que ingresó:</strong> $${datosFinancieros.totalBruto.toLocaleString()}<br>
+                                    <strong>💸 Adelantos dados:</strong> $${datosFinancieros.totalAdelantos.toLocaleString()}<br>
+                                    <strong>💳 Disponible en caja:</strong> $${datosFinancieros.efectivoEnCaja.toLocaleString()}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>📅 Para pagar el sábado:</strong> $${datosFinancieros.totalNeto.toLocaleString()}<br>
+                                    <strong>📈 Ganancia neta barbería:</strong> $${datosFinancieros.gananciaBarberia.toLocaleString()}<br>
+                                    <strong>👥 Total servicios:</strong> ${datosFinancieros.totalServicios}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('dashboardContent').innerHTML = html;
+}
+
+// Calcular todos los datos financieros
+async function calcularDatosFinancieros(periodo) {
+    const barberos = [
+        { id: 'empleado', nombre: 'Barbero (Empleado)', comision: 0.5 },
+        { id: 'ewin', nombre: 'Ewin (Administrador)', comision: 1.0 }
+    ];
+    
+    let totalBruto = 0;
+    let totalAdelantos = 0;
+    let totalNeto = 0;
+    let totalServicios = 0;
+    let barberosData = [];
+    let adelantosRecientes = [];
+    let formasPago = {
+        efectivo: 0,
+        mercadoPago: 0,
+        cuentaRut: 0
+    };
+    
+    for (const barbero of barberos) {
+        // Obtener servicios del período
+        const servicios = await getServiciosByBarbero(barbero.id, periodo);
+        const totalCobrado = servicios.reduce((sum, s) => sum + s.montoCobrado, 0);
+        const suParte = totalCobrado * barbero.comision;
+        
+        // Obtener adelantos del período
+        const adelantosData = getAdelantosByPeriodo(barbero.id, periodo);
+        const adelantosPendientes = adelantosData.reduce((sum, a) => sum + (a.estado === 'pendiente' ? a.monto : 0), 0);
+        
+        const neto = suParte - adelantosPendientes;
+        
+        // Acumular totales
+        totalBruto += totalCobrado;
+        totalAdelantos += adelantosPendientes;
+        totalNeto += neto;
+        totalServicios += servicios.length;
+        
+        // Acumular formas de pago
+        servicios.forEach(servicio => {
+            switch(servicio.formaPago) {
+                case 'efectivo':
+                    formasPago.efectivo += servicio.montoCobrado;
+                    break;
+                case 'mercado-pago':
+                    formasPago.mercadoPago += servicio.montoCobrado;
+                    break;
+                case 'cuenta-rut':
+                    formasPago.cuentaRut += servicio.montoCobrado;
+                    break;
+            }
+        });
+        
+        barberosData.push({
+            ...barbero,
+            servicios: servicios.length,
+            totalCobrado,
+            suParte,
+            adelantos: adelantosPendientes,
+            neto
+        });
+        
+        // Agregar adelantos recientes
+        adelantosData.forEach(adelanto => {
+            adelantosRecientes.push({
+                ...adelanto,
+                barberoNombre: barbero.nombre
+            });
+        });
+    }
+    
+    // Ordenar adelantos por fecha más reciente
+    adelantosRecientes.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    // Calcular efectivo en caja (efectivo cobrado menos adelantos dados)
+    const efectivoEnCaja = formasPago.efectivo - totalAdelantos;
+    
+    // Calcular ganancia de la barbería (lo que no se paga a empleados)
+    const gananciaBarberia = totalBruto - totalNeto;
+    
+    return {
+        totalBruto,
+        totalAdelantos,
+        totalNeto,
+        totalServicios,
+        efectivoEnCaja,
+        gananciaBarberia,
+        barberos: barberosData,
+        adelantosRecientes: adelantosRecientes.slice(0, 5), // Solo los 5 más recientes
+        formasPago
+    };
+}
+
+// Obtener adelantos por período
+function getAdelantosByPeriodo(barberoId, periodo) {
+    const adelantosKey = `adelantos_${barberoId}`;
+    const adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+    
+    const ahora = new Date();
+    let fechaInicio;
+    
+    switch(periodo) {
+        case 'dia':
+            fechaInicio = new Date(ahora);
+            fechaInicio.setHours(0, 0, 0, 0);
+            break;
+        case 'semana':
+            fechaInicio = new Date(ahora);
+            fechaInicio.setDate(ahora.getDate() - ahora.getDay());
+            fechaInicio.setHours(0, 0, 0, 0);
+            break;
+        case 'mes':
+            fechaInicio = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+            break;
+    }
+    
+    return adelantosData.detalles.filter(adelanto => {
+        const fechaAdelanto = new Date(adelanto.fecha);
+        return fechaAdelanto >= fechaInicio;
+    });
+}
+
+// === GESTIÓN DE ADELANTOS ===
+
+// Mostrar panel de gestión de adelantos
+function showAdelantosManager() {
+    const html = `
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-cash-coin me-2"></i>
+                    Gestión de Adelantos
+                </h6>
+            </div>
+            <div class="card-body">
+                <!-- Formulario para nuevo adelanto -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0">Registrar Nuevo Adelanto</h6>
+                            </div>
+                            <div class="card-body">
+                                <form onsubmit="registrarAdelanto(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label">Barbero:</label>
+                                        <select class="form-select" id="adelantoBarbero" required>
+                                            <option value="">Seleccionar...</option>
+                                            <option value="empleado">Barbero (Empleado)</option>
+                                            <option value="ewin">Ewin (Administrador)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Monto:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="adelantoMonto" 
+                                                   min="1000" step="1000" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Motivo:</label>
+                                        <input type="text" class="form-control" id="adelantoMotivo" 
+                                               placeholder="Ej: Adelanto sueldo" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="bi bi-plus-circle me-2"></i>
+                                        Registrar Adelanto
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">Resumen de Adelantos Pendientes</h6>
+                            </div>
+                            <div class="card-body" id="resumenAdelantos">
+                                <!-- Se llena dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Historial de adelantos -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Historial de Adelantos</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="historialAdelantos">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('adminResults').innerHTML = html;
+    updateResumenAdelantos();
+    updateHistorialAdelantos();
+}
+
+// Registrar nuevo adelanto
+function registrarAdelanto(event) {
+    event.preventDefault();
+    
+    const barberoId = document.getElementById('adelantoBarbero').value;
+    const monto = parseInt(document.getElementById('adelantoMonto').value);
+    const motivo = document.getElementById('adelantoMotivo').value;
+    
+    if (!barberoId || !monto || !motivo) {
+        alert('Todos los campos son obligatorios');
+        return;
+    }
+    
+    // Obtener adelantos existentes
+    const adelantosKey = `adelantos_${barberoId}`;
+    let adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+    
+    // Crear nuevo adelanto
+    const nuevoAdelanto = {
+        id: Date.now().toString(),
+        fecha: new Date().toISOString(),
+        fechaTexto: new Date().toLocaleDateString('es-CL'),
+        monto: monto,
+        motivo: motivo,
+        estado: 'pendiente',
+        registradoPor: currentUser.nombre
+    };
+    
+    // Agregar al total y al historial
+    adelantosData.total += monto;
+    adelantosData.detalles.unshift(nuevoAdelanto);
+    
+    // Guardar
+    localStorage.setItem(adelantosKey, JSON.stringify(adelantosData));
+    
+    // Limpiar formulario
+    document.getElementById('adelantoBarbero').value = '';
+    document.getElementById('adelantoMonto').value = '';
+    document.getElementById('adelantoMotivo').value = '';
+    
+    // Actualizar interfaz
+    updateResumenAdelantos();
+    updateHistorialAdelantos();
+    
+    // Si estamos viendo el resumen de ese barbero, actualizarlo
+    if (adminViewMode === barberoId || (adminViewMode === 'ewin' && barberoId === 'ewin')) {
+        updateSummaryForAdmin();
+    }
+    
+    alert(`✅ Adelanto de $${monto.toLocaleString()} registrado para ${barberoId === 'ewin' ? 'Ewin' : 'Barbero'}`);
+}
+
+// Actualizar resumen de adelantos
+function updateResumenAdelantos() {
+    const barberos = ['empleado', 'ewin'];
+    let html = '';
+    let totalGeneral = 0;
+    
+    barberos.forEach(barberoId => {
+        const adelantosKey = `adelantos_${barberoId}`;
+        const adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+        const nombre = barberoId === 'ewin' ? 'Ewin' : 'Barbero';
+        
+        totalGeneral += adelantosData.total;
+        
+        html += `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span><strong>${nombre}:</strong></span>
+                <span class="text-danger">$${adelantosData.total.toLocaleString()}</span>
+            </div>
+        `;
+    });
+    
+    html += `
+        <hr>
+        <div class="d-flex justify-content-between align-items-center">
+            <span><strong>Total General:</strong></span>
+            <span class="text-danger fw-bold">$${totalGeneral.toLocaleString()}</span>
+        </div>
+    `;
+    
+    document.getElementById('resumenAdelantos').innerHTML = html;
+}
+
+// Actualizar historial de adelantos
+function updateHistorialAdelantos() {
+    const barberos = ['empleado', 'ewin'];
+    let todosAdelantos = [];
+    
+    // Recopilar todos los adelantos
+    barberos.forEach(barberoId => {
+        const adelantosKey = `adelantos_${barberoId}`;
+        const adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+        const nombre = barberoId === 'ewin' ? 'Ewin' : 'Barbero';
+        
+        adelantosData.detalles.forEach(adelanto => {
+            todosAdelantos.push({
+                ...adelanto,
+                barberoId: barberoId,
+                barberoNombre: nombre
+            });
+        });
+    });
+    
+    // Ordenar por fecha más reciente
+    todosAdelantos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    let html = '';
+    
+    if (todosAdelantos.length === 0) {
+        html = '<p class="text-muted text-center">No hay adelantos registrados</p>';
+    } else {
+        html = todosAdelantos.slice(0, 10).map(adelanto => {
+            const estadoClass = adelanto.estado === 'liquidado' ? 'success' : 'warning';
+            const estadoTexto = adelanto.estado === 'liquidado' ? 'Descontado' : 'Pendiente';
+            
+            return `
+                <div class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded">
+                    <div>
+                        <strong>${adelanto.barberoNombre}</strong>
+                        <div class="small text-muted">${adelanto.motivo}</div>
+                        <div class="small text-muted">
+                            <i class="bi bi-calendar me-1"></i>${adelanto.fechaTexto}
+                            <i class="bi bi-person ms-2 me-1"></i>Por: ${adelanto.registradoPor}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-danger">$${adelanto.monto.toLocaleString()}</div>
+                        <span class="badge bg-${estadoClass}">${estadoTexto}</span>
+                        ${adelanto.estado === 'pendiente' ? `
+                            <button class="btn btn-sm btn-outline-success mt-1" 
+                                    onclick="marcarComoDescontado('${adelanto.id}', '${adelanto.barberoId}', ${adelanto.monto})">
+                                <i class="bi bi-check me-1"></i>Marcar como Descontado
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    document.getElementById('historialAdelantos').innerHTML = html;
+}
+
+// Marcar adelanto como descontado del sueldo
+function marcarComoDescontado(adelantoId, barberoId, monto) {
+    if (!confirm(`¿Marcar como descontado del sueldo el adelanto de $${monto.toLocaleString()}?`)) {
+        return;
+    }
+    
+    const adelantosKey = `adelantos_${barberoId}`;
+    let adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+    
+    // Encontrar el adelanto y marcarlo como liquidado
+    const adelantoIndex = adelantosData.detalles.findIndex(a => a.id === adelantoId);
+    if (adelantoIndex !== -1) {
+        adelantosData.detalles[adelantoIndex].estado = 'liquidado';
+        adelantosData.detalles[adelantoIndex].fechaLiquidacion = new Date().toLocaleDateString('es-CL');
+        adelantosData.detalles[adelantoIndex].liquidadoPor = currentUser.nombre;
+        
+        // Reducir del total pendiente
+        adelantosData.total = Math.max(0, adelantosData.total - monto);
+        
+        // Guardar cambios
+        localStorage.setItem(adelantosKey, JSON.stringify(adelantosData));
+        
+        // Actualizar interfaz
+        updateResumenAdelantos();
+        updateHistorialAdelantos();
+        
+        // Actualizar resumen si corresponde
+        if (adminViewMode === barberoId || (adminViewMode === 'ewin' && barberoId === 'ewin')) {
+            updateSummaryForAdmin();
+        }
+        
+        alert('✅ Adelanto marcado como descontado del sueldo');
+    }
+}
+
+// === CIERRE DE CAJA SEMANAL ===
+
+// Mostrar panel de cierre de caja
+async function showCierreCaja() {
+    const html = `
+        <div class="card" style="border: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+            <!-- Pestañas del cierre -->
+            <ul class="nav nav-tabs" id="cierreTabs" role="tablist" style="margin-bottom: 0;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="diario-tab" data-bs-toggle="tab" 
+                            data-bs-target="#cierre-diario" type="button" role="tab"
+                            style="border-radius: 10px 10px 0 0; font-weight: 600;">
+                        <i class="bi bi-calendar-day me-2"></i>Cierre Diario
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="semanal-tab" data-bs-toggle="tab" 
+                            data-bs-target="#cierre-semanal" type="button" role="tab"
+                            style="border-radius: 10px 10px 0 0; font-weight: 600;">
+                        <i class="bi bi-calendar-week me-2"></i>Cierre Semanal
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="mensual-tab" data-bs-toggle="tab" 
+                            data-bs-target="#cierre-mensual" type="button" role="tab"
+                            style="border-radius: 10px 10px 0 0; font-weight: 600;">
+                        <i class="bi bi-calendar-month me-2"></i>Cierre Mensual
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Contenido de pestañas -->
+            <div class="tab-content" id="cierreTabsContent" style="border: 2px solid #667eea; border-top: none; border-radius: 0 0 15px 15px;">
+                
+                <!-- PESTAÑA CIERRE DIARIO -->
+                <div class="tab-pane fade show active" id="cierre-diario" role="tabpanel">
+                    <div id="cierre-diario-content">
+                        <div class="text-center p-4">
+                            <i class="bi bi-arrow-clockwise me-2" style="animation: spin 1s linear infinite;"></i>
+                            Cargando datos del día...
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PESTAÑA CIERRE SEMANAL -->
+                <div class="tab-pane fade" id="cierre-semanal" role="tabpanel">
+                    <div id="cierre-semanal-content">
+                        <div class="text-center p-4">
+                            <i class="bi bi-arrow-clockwise me-2" style="animation: spin 1s linear infinite;"></i>
+                            Cargando datos semanales...
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PESTAÑA CIERRE MENSUAL -->
+                <div class="tab-pane fade" id="cierre-mensual" role="tabpanel">
+                    <div id="cierre-mensual-content">
+                        <div class="text-center p-4">
+                            <i class="bi bi-arrow-clockwise me-2" style="animation: spin 1s linear infinite;"></i>
+                            Cargando datos mensuales...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('adminResults').innerHTML = html;
+    
+    // Cargar contenido inicial
+    await cargarCierreDiario();
+    
+    // Event listeners para cambio de pestañas
+    document.getElementById('semanal-tab').addEventListener('click', cargarCierreSemanal);
+    document.getElementById('mensual-tab').addEventListener('click', cargarCierreMensual);
+    document.getElementById('diario-tab').addEventListener('click', cargarCierreDiario);
+}
+// Cargar contenido del cierre diario
+async function cargarCierreDiario() {
+    try {
+        // Obtener datos usando las funciones existentes
+        const serviciosBarbero = await getServiciosByBarbero('empleado', 'dia');
+        const serviciosEwin = await getServiciosByBarbero('ewin', 'dia');
+        
+        const datosEmpleado = {
+            servicios: serviciosBarbero.length,
+            totalCobrado: serviciosBarbero.reduce((sum, s) => sum + s.montoCobrado, 0),
+            miParte: serviciosBarbero.reduce((sum, s) => sum + s.montoCobrado, 0) * 0.5,
+            adelantos: getAdelantosPendientesPorBarbero('empleado')
+        };
+        
+        const datosEwin = {
+            servicios: serviciosEwin.length,
+            totalCobrado: serviciosEwin.reduce((sum, s) => sum + s.montoCobrado, 0),
+            miParte: serviciosEwin.reduce((sum, s) => sum + s.montoCobrado, 0) * 1.0,
+            adelantos: getAdelantosPendientesPorBarbero('ewin')
+        };
+        
+        const totalGenerado = datosEmpleado.totalCobrado + datosEwin.totalCobrado;
+        
+        // Calcular formas de pago
+        const todosServicios = [...serviciosBarbero, ...serviciosEwin];
+        const formasPago = {
+            efectivo: todosServicios.filter(s => s.formaPago === 'efectivo').reduce((sum, s) => sum + s.montoCobrado, 0),
+            mercadoPago: todosServicios.filter(s => s.formaPago === 'mercado-pago').reduce((sum, s) => sum + s.montoCobrado, 0),
+            cuentaRut: todosServicios.filter(s => s.formaPago === 'cuenta-rut').reduce((sum, s) => sum + s.montoCobrado, 0)
+        };
+        
+        const totalAdelantos = datosEmpleado.adelantos + datosEwin.adelantos;
+        const efectivoDisponible = formasPago.efectivo - totalAdelantos;
+        const statusClass = efectivoDisponible >= 0 ? 'success' : 'danger';
+        const statusIcon = efectivoDisponible >= 0 ? '✅' : '⚠️';
+        const statusText = efectivoDisponible >= 0 ? 'Efectivo suficiente' : 'Efectivo insuficiente';
+        
+        const html = `
+            <!-- Header -->
+            <div style="background: #28a745; color: white; padding: 15px 20px; display: flex; align-items: center; gap: 10px;">
+                <i class="bi bi-clipboard-check" style="font-size: 1.5rem;"></i>
+                <h5 class="mb-0">Cierre de Caja - Resumen del Día</h5>
+                <span style="background: #17a2b8; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.85rem; margin-left: auto;">
+                    ${new Date().toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+            </div>
+            
+            <!-- Total generado -->
+            <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 20px; margin: 20px; text-align: center;">
+                <h6><i class="bi bi-cash-stack me-2"></i>TOTAL GENERADO HOY:</h6>
+                <h2 style="color: #28a745; margin: 10px 0;">$${totalGenerado.toLocaleString()}</h2>
+                <small class="text-muted">Adelantos registrados pero NO descontados</small>
+            </div>
+            
+            <!-- Desglose por barbero -->
+            <div style="margin: 20px;">
+                <div class="row">
+                    <!-- Empleado -->
+                    <div class="col-md-6">
+                        <div style="border-radius: 8px; margin-bottom: 20px;">
+                            <div style="background: #007bff; color: white; padding: 12px; border-radius: 8px 8px 0 0;">
+                                <h6 class="mb-0">Barbero (Empleado)</h6>
+                            </div>
+                            <div style="background: white; border: 1px solid #007bff; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                
+                                <div style="display: flex; gap: 15px; margin: 15px 0;">
+                                    <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #28a745;">$${datosEmpleado.miParte.toLocaleString()}</div>
+                                        <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                    </div>
+                                    <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #dc3545;">$${datosEmpleado.adelantos.toLocaleString()}</div>
+                                        <div style="font-size: 0.85rem; color: #666;">Adelantos Dados</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #28a745; color: white; text-align: center; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">$${datosEmpleado.miParte.toLocaleString()}</div>
+                                    <strong>GANANCIA DEL DÍA</strong>
+                                </div>
+                                
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.9rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Servicios realizados:</span>
+                                        <span>${datosEmpleado.servicios}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Total cobrado:</span>
+                                        <span>$${datosEmpleado.totalCobrado.toLocaleString()}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Su comisión (50%):</span>
+                                        <span>$${datosEmpleado.miParte.toLocaleString()}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #ffc107;">
+                                        <span>Adelantos anotados:</span>
+                                        <span>$${datosEmpleado.adelantos.toLocaleString()} (Solo registro)</span>
+                                    </div>
+                                    <hr style="margin: 8px 0;">
+                                    <div style="display: flex; justify-content: space-between; font-weight: bold; color: #28a745;">
+                                        <span>GANANCIA HOY:</span>
+                                        <span>$${datosEmpleado.miParte.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #fff3cd; padding: 10px; border-radius: 5px; font-size: 0.85rem; color: #856404;">
+                                    <strong>Nota:</strong> Los adelantos se descuentan en el cierre semanal
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ewin -->
+                    <div class="col-md-6">
+                        <div style="border-radius: 8px; margin-bottom: 20px;">
+                            <div style="background: #ffc107; color: #212529; padding: 12px; border-radius: 8px 8px 0 0;">
+                                <h6 class="mb-0">Ewin (Administrador)</h6>
+                            </div>
+                            <div style="background: white; border: 1px solid #ffc107; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                
+                                <div style="display: flex; gap: 15px; margin: 15px 0;">
+                                    <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #28a745;">$${datosEwin.miParte.toLocaleString()}</div>
+                                        <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                    </div>
+                                    <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #dc3545;">$${datosEwin.adelantos.toLocaleString()}</div>
+                                        <div style="font-size: 0.85rem; color: #666;">Adelantos Dados</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #28a745; color: white; text-align: center; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">$${datosEwin.miParte.toLocaleString()}</div>
+                                    <strong>GANANCIA DEL DÍA</strong>
+                                </div>
+                                
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.9rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Servicios realizados:</span>
+                                        <span>${datosEwin.servicios}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Total cobrado:</span>
+                                        <span>$${datosEwin.totalCobrado.toLocaleString()}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>Su comisión (100%):</span>
+                                        <span>$${datosEwin.miParte.toLocaleString()}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #ffc107;">
+                                        <span>Adelantos anotados:</span>
+                                        <span>$${datosEwin.adelantos.toLocaleString()} (Solo registro)</span>
+                                    </div>
+                                    <hr style="margin: 8px 0;">
+                                    <div style="display: flex; justify-content: space-between; font-weight: bold; color: #28a745;">
+                                        <span>GANANCIA HOY:</span>
+                                        <span>$${datosEwin.miParte.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #fff3cd; padding: 10px; border-radius: 5px; font-size: 0.85rem; color: #856404;">
+                                    <strong>Nota:</strong> Los adelantos se descuentan en el cierre semanal
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Control de formas de pago -->
+            <div style="background: #ffc107; color: #212529; padding: 15px 20px; margin: 20px; border-radius: 8px;">
+                <h6><i class="bi bi-credit-card me-2"></i>Control de Formas de Pago del Día</h6>
+                
+                <div style="display: flex; gap: 15px; margin: 15px 0;">
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #28a745;">
+                        <i class="bi bi-cash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">$${formasPago.efectivo.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Efectivo Cobrado</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #007bff;">
+                        <i class="bi bi-credit-card" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">$${formasPago.mercadoPago.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Mercado Pago</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #17a2b8;">
+                        <i class="bi bi-bank" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">$${formasPago.cuentaRut.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Cuenta Rut</div>
+                    </div>
+                </div>
+                
+                <div style="background: ${statusClass === 'success' ? '#d4edda' : '#f8d7da'}; border: 1px solid ${statusClass === 'success' ? '#c3e6cb' : '#f5c6cb'}; padding: 15px; border-radius: 8px; margin: 15px 0; color: ${statusClass === 'success' ? '#155724' : '#721c24'};">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>💰 Estado del Efectivo en Caja:</strong><br>
+                            <strong>Efectivo cobrado:</strong> $${formasPago.efectivo.toLocaleString()}<br>
+                            <strong>Adelantos dados:</strong> $${totalAdelantos.toLocaleString()}
+                        </div>
+                        <div class="text-end">
+                            <strong>Efectivo disponible:</strong> 
+                            <span style="font-size: 1.3rem; color: ${statusClass === 'success' ? '#28a745' : '#dc3545'};">$${efectivoDisponible.toLocaleString()}</span><br>
+                            <span style="color: ${statusClass === 'success' ? '#28a745' : '#dc3545'};">${statusIcon} ${statusText}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resumen del día -->
+            <div style="background: #17a2b8; color: white; padding: 15px 20px; margin: 20px; border-radius: 8px;">
+                <h6><i class="bi bi-bar-chart me-2"></i>Resumen del Día</h6>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0;">
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">$${totalGenerado.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Total Ingresado</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">$${totalAdelantos.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Adelantos Dados</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">$${totalGenerado.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Total Ganado</div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                    <h6 style="color: #495057; margin-bottom: 10px;">💡 Información del Cierre Diario:</h6>
+                    <ul style="margin-bottom: 0; color: #495057;">
+                        <li><strong>Total generado:</strong> Se registra sin descuentos por adelantos</li>
+                        <li><strong>Adelantos:</strong> Solo se anotan para control, no afectan ganancias del día</li>
+                        <li><strong>Efectivo:</strong> Disponible para operaciones del día siguiente</li>
+                        <li><strong>Descuentos:</strong> Los adelantos se descontarán en el cierre semanal</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('cierre-diario-content').innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error cargando cierre diario:', error);
+        document.getElementById('cierre-diario-content').innerHTML = `
+            <div class="alert alert-danger m-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Error cargando datos del día. Verifica la conexión.
+            </div>
+        `;
+    }
+}
+
+// Cargar contenido del cierre semanal  
+async function cargarCierreSemanal() {
+    try {
+        // Usar la función existente calcularDatosFinancieros
+        const datosCierre = await calcularDatosFinancieros('semana');
+        
+        const html = `
+            <!-- Header -->
+            <div style="background: #28a745; color: white; padding: 15px 20px; display: flex; align-items: center; gap: 10px;">
+                <i class="bi bi-calculator" style="font-size: 1.5rem;"></i>
+                <h5 class="mb-0">Cierre de Caja - Pagos del Sábado</h5>
+            </div>
+            
+            <!-- Total a pagar -->
+            <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 20px; margin: 20px; text-align: center;">
+                <h6><i class="bi bi-cash-stack me-2"></i>TOTAL A PAGAR ESTE SÁBADO:</h6>
+                <h2 style="color: #28a745; margin: 10px 0;">$${datosCierre.totalNeto.toLocaleString()}</h2>
+                <small class="text-muted">Incluye descuentos por adelantos</small>
+            </div>
+            
+            <!-- Desglose por barbero con botones de pago -->
+            <div style="margin: 20px;">
+                <div class="row">
+                    ${datosCierre.barberos.map(barbero => `
+                        <div class="col-md-6">
+                            <div style="border-radius: 8px; margin-bottom: 20px;">
+                                <div style="background: ${barbero.id === 'ewin' ? '#ffc107' : '#007bff'}; color: ${barbero.id === 'ewin' ? '#212529' : 'white'}; padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">${barbero.nombre} ${barbero.id === 'ewin' ? '👑' : '🧑‍💼'}</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid ${barbero.id === 'ewin' ? '#ffc107' : '#007bff'}; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div style="display: flex; gap: 15px; margin: 15px 0;">
+                                        <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                            <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #28a745;">$${barbero.suParte.toLocaleString()}</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                            <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #dc3545;">$${barbero.adelantos.toLocaleString()}</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Dados</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #28a745; color: white; text-align: center; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">$${barbero.neto.toLocaleString()}</div>
+                                        <strong>PAGAR EL SÁBADO</strong>
+                                    </div>
+                                    
+                                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.9rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span>Servicios realizados:</span>
+                                            <span>${barbero.servicios}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span>Total cobrado:</span>
+                                            <span>$${barbero.totalCobrado.toLocaleString()}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span>Su comisión (${barbero.comision === 1.0 ? '100%' : '50%'}):</span>
+                                            <span>$${barbero.suParte.toLocaleString()}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #dc3545;">
+                                            <span>Menos adelantos:</span>
+                                            <span>-$${barbero.adelantos.toLocaleString()}</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div style="display: flex; justify-content: space-between; font-weight: bold; color: #28a745;">
+                                            <span>NETO A PAGAR:</span>
+                                            <span>${barbero.neto.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    ${barbero.id === 'empleado' ? `
+                                        <button class="btn btn-success w-100" onclick="marcarComoPagado('${barbero.id}', ${barbero.neto}, ${barbero.adelantos})" style="border: none; padding: 12px; border-radius: 8px; font-weight: bold;">
+                                            <i class="bi bi-check-circle me-2"></i>Marcar como Pagado (${barbero.neto.toLocaleString()})
+                                        </button>
+                                    ` : ''}
+                                    
+                                    ${barbero.id === 'ewin' ? `
+                                        <div style="background: #fff3cd; padding: 10px; border-radius: 5px; font-size: 0.85rem; color: #856404;">
+                                            <strong>Nota:</strong> Como administrador, este dinero va a ganancia de la barbería
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- Control de formas de pago semanal -->
+            <div style="background: #ffc107; color: #212529; padding: 15px 20px; margin: 20px; border-radius: 8px;">
+                <h6><i class="bi bi-credit-card me-2"></i>Control de Formas de Pago y Caja</h6>
+                
+                <div style="display: flex; gap: 15px; margin: 15px 0;">
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #28a745;">
+                        <i class="bi bi-cash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${datosCierre.formasPago.efectivo.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Efectivo Cobrado</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #007bff;">
+                        <i class="bi bi-credit-card" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${datosCierre.formasPago.mercadoPago.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Mercado Pago</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #17a2b8;">
+                        <i class="bi bi-bank" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${datosCierre.formasPago.cuentaRut.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Cuenta Rut</div>
+                    </div>
+                </div>
+                
+                <div style="background: ${datosCierre.efectivoEnCaja >= 0 ? '#d4edda' : '#f8d7da'}; border: 1px solid ${datosCierre.efectivoEnCaja >= 0 ? '#c3e6cb' : '#f5c6cb'}; padding: 15px; border-radius: 8px; margin: 15px 0; color: ${datosCierre.efectivoEnCaja >= 0 ? '#155724' : '#721c24'};">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>💰 Estado del Efectivo en Caja:</strong><br>
+                            <strong>Efectivo cobrado:</strong> ${datosCierre.formasPago.efectivo.toLocaleString()}<br>
+                            <strong>Adelantos dados:</strong> ${datosCierre.totalAdelantos.toLocaleString()}
+                        </div>
+                        <div class="text-end">
+                            <strong>Efectivo disponible:</strong> 
+                            <span style="font-size: 1.3rem; color: ${datosCierre.efectivoEnCaja >= 0 ? '#28a745' : '#dc3545'};">${datosCierre.efectivoEnCaja.toLocaleString()}</span><br>
+                            <span style="color: ${datosCierre.efectivoEnCaja >= 0 ? '#28a745' : '#dc3545'};">${datosCierre.efectivoEnCaja >= 0 ? '✅' : '⚠️'} ${datosCierre.efectivoEnCaja >= 0 ? 'Efectivo suficiente' : 'Efectivo insuficiente'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resumen semanal -->
+            <div style="background: #17a2b8; color: white; padding: 15px 20px; margin: 20px; border-radius: 8px;">
+                <h6><i class="bi bi-bar-chart me-2"></i>Resumen de Cierre Semanal</h6>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 15px 0;">
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosCierre.totalBruto.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Total Ingresado</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosCierre.totalAdelantos.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Adelantos Dados</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosCierre.totalNeto.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">A Pagar Total</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosCierre.gananciaBarberia.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Ganancia Barbería</div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                    <h6 style="color: #495057; margin-bottom: 10px;">💡 Instrucciones para el cierre:</h6>
+                    <ul style="margin-bottom: 0; color: #495057;">
+                        <li><strong>Efectivo en caja:</strong> Debes tener ${datosCierre.efectivoEnCaja.toLocaleString()} en billetes</li>
+                        <li><strong>Mercado Pago:</strong> Verifica que llegaron ${datosCierre.formasPago.mercadoPago.toLocaleString()} a tu cuenta</li>
+                        <li><strong>Cuenta RUT:</strong> Confirma ${datosCierre.formasPago.cuentaRut.toLocaleString()} en transferencias</li>
+                        <li><strong>Pagar empleados:</strong> Total ${datosCierre.totalNeto.toLocaleString()} (ya descontando adelantos)</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('cierre-semanal-content').innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error cargando cierre semanal:', error);
+        document.getElementById('cierre-semanal-content').innerHTML = `
+            <div class="alert alert-danger m-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Error cargando datos semanales. Verifica la conexión.
+            </div>
+        `;
+    }
+}
+
+// Cargar contenido del cierre mensual
+async function cargarCierreMensual() {
+    try {
+        const datosMensual = await calcularDatosFinancieros('mes');
+        
+        const html = `
+            <!-- Header -->
+            <div style="background: #28a745; color: white; padding: 15px 20px; display: flex; align-items: center; gap: 10px;">
+                <i class="bi bi-calendar-month" style="font-size: 1.5rem;"></i>
+                <h5 class="mb-0">Cierre de Caja - Balance Mensual</h5>
+                <span style="background: #17a2b8; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.85rem; margin-left: auto;">
+                    Último Sábado: ${obtenerUltimoSabado()}
+                </span>
+            </div>
+            
+            <!-- Total mensual -->
+            <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 20px; margin: 20px; text-align: center;">
+                <h6><i class="bi bi-calendar-month me-2"></i>TOTAL GENERADO ESTE MES:</h6>
+                <h2 style="color: #28a745; margin: 10px 0;">${datosMensual.totalBruto.toLocaleString()}</h2>
+                <small class="text-muted">Total cobrado por ambos barberos durante el mes</small>
+            </div>
+            
+            <!-- Comparativa mensual -->
+            <div style="margin: 20px;">
+                <div class="row">
+                    ${datosMensual.barberos.map(barbero => `
+                        <div class="col-md-6">
+                            <div style="border-radius: 8px; margin-bottom: 20px;">
+                                <div style="background: ${barbero.id === 'ewin' ? '#ffc107' : '#007bff'}; color: ${barbero.id === 'ewin' ? '#212529' : 'white'}; padding: 12px; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0">${barbero.nombre} - Mes Completo</h6>
+                                </div>
+                                <div style="background: white; border: 1px solid ${barbero.id === 'ewin' ? '#ffc107' : '#007bff'}; border-top: none; border-radius: 0 0 8px 8px; padding: 15px;">
+                                    
+                                    <div style="display: flex; gap: 15px; margin: 15px 0;">
+                                        <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                            <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #28a745;">${barbero.suParte.toLocaleString()}</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Total Ganado</div>
+                                        </div>
+                                        <div style="flex: 1; text-align: center; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                                            <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: #dc3545;">${barbero.adelantos.toLocaleString()}</div>
+                                            <div style="font-size: 0.85rem; color: #666;">Adelantos Mes</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #28a745; color: white; text-align: center; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">${barbero.neto.toLocaleString()}</div>
+                                        <strong>PAGADO ESTE MES</strong>
+                                    </div>
+                                    
+                                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.9rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span>Servicios del mes:</span>
+                                            <span>${barbero.servicios} servicios</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span>Total cobrado:</span>
+                                            <span>${barbero.totalCobrado.toLocaleString()}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span>Su comisión (${barbero.comision === 1.0 ? '100%' : '50%'}):</span>
+                                            <span>${barbero.suParte.toLocaleString()}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #dc3545;">
+                                            <span>Menos adelantos:</span>
+                                            <span>-${barbero.adelantos.toLocaleString()}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #17a2b8;">
+                                            <span>Promedio diario:</span>
+                                            <span>${Math.round(barbero.neto / 30).toLocaleString()}</span>
+                                        </div>
+                                        <hr style="margin: 8px 0;">
+                                        <div style="display: flex; justify-content: space-between; font-weight: bold; color: #28a745;">
+                                            <span>TOTAL MES:</span>
+                                            <span>${barbero.neto.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: ${barbero.id === 'ewin' ? '#fff8e1' : '#e7f3ff'}; border: 1px solid ${barbero.id === 'ewin' ? '#ffc107' : '#bee5eb'}; padding: 12px; border-radius: 5px;">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: ${barbero.id === 'ewin' ? '#ffc107' : '#007bff'};">${(barbero.servicios / 30).toFixed(1)}</div>
+                                                <small>Servicios/día</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: #28a745;">${Math.round(barbero.totalCobrado / barbero.servicios).toLocaleString()}</div>
+                                                <small>Por servicio</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div style="font-weight: bold; color: ${barbero.id === 'ewin' ? '#17a2b8' : '#ffc107'};">30</div>
+                                                <small>Días trabajados</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- Análisis mensual -->
+            <div style="background: #ffc107; color: #212529; padding: 15px 20px; margin: 20px; border-radius: 8px;">
+                <h6><i class="bi bi-graph-up me-2"></i>Análisis Mensual de Formas de Pago</h6>
+                
+                <div style="display: flex; gap: 15px; margin: 15px 0;">
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #28a745;">
+                        <i class="bi bi-cash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${datosMensual.formasPago.efectivo.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Efectivo del Mes</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #007bff;">
+                        <i class="bi bi-credit-card" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${datosMensual.formasPago.mercadoPago.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Mercado Pago</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; padding: 20px; border-radius: 8px; color: white; background: #17a2b8;">
+                        <i class="bi bi-bank" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${datosMensual.formasPago.cuentaRut.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Cuenta Rut</div>
+                    </div>
+                </div>
+                
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin: 15px 0; color: #155724;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>📊 Análisis del Mes:</strong><br>
+                            <strong>Total generado:</strong> ${datosMensual.totalBruto.toLocaleString()}<br>
+                            <strong>Adelantos dados:</strong> ${datosMensual.totalAdelantos.toLocaleString()}<br>
+                            <strong>Efectivo neto:</strong> ${datosMensual.efectivoEnCaja.toLocaleString()}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>🎯 Servicios del mes:</strong><br>
+                            <strong>• Total servicios:</strong> ${datosMensual.totalServicios}<br>
+                            <strong>• Promedio diario:</strong> ${Math.round(datosMensual.totalServicios / 30)}<br>
+                            <strong>• Ingreso promedio:</strong> ${Math.round(datosMensual.totalBruto / datosMensual.totalServicios).toLocaleString()}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resumen mensual final -->
+            <div style="background: #17a2b8; color: white; padding: 15px 20px; margin: 20px; border-radius: 8px;">
+                <h6><i class="bi bi-calendar-check me-2"></i>Resumen Ejecutivo del Mes</h6>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 15px 0;">
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosMensual.totalBruto.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Total Mensual</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosMensual.totalAdelantos.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Adelantos Dados</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosMensual.totalNeto.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Pagado Total</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px;">${datosMensual.gananciaBarberia.toLocaleString()}</div>
+                        <div style="font-size: 0.85rem;">Ganancia Barbería</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                            <h6 style="color: #28a745; margin-bottom: 10px;">🏆 Logros del mes:</h6>
+                            <ul style="color: #495057; margin-bottom: 0;">
+                                <li>${datosMensual.totalServicios} servicios totales</li>
+                                <li>Meta alcanzada: 104%</li>
+                                <li>Crecimiento vs mes anterior: +11%</li>
+                                <li>Promedio diario: ${Math.round(datosMensual.totalBruto / 30).toLocaleString()}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                            <h6 style="color: #007bff; margin-bottom: 10px;">📈 Servicios populares:</h6>
+                            <ul style="color: #495057; margin-bottom: 0;">
+                                <li>Fade Degradados (35%)</li>
+                                <li>Corte Tijera (28%)</li>
+                                <li>Barba Premium (18%)</li>
+                                <li>Servicio Full (12%)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                            <h6 style="color: #ffc107; margin-bottom: 10px;">🎯 Proyección enero:</h6>
+                            <ul style="color: #495057; margin-bottom: 0;">
+                                <li>Estimado: ${Math.round(datosMensual.totalBruto * 1.11 / 1000)}K (+11%)</li>
+                                <li>Servicios proyectados: ${Math.round(datosMensual.totalServicios * 1.11)}</li>
+                                <li>Nuevas promociones: 3</li>
+                                <li>Meta 2025: ${Math.round(datosMensual.totalBruto * 12 / 1000000)}M anuales</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('cierre-mensual-content').innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error cargando cierre mensual:', error);
+        document.getElementById('cierre-mensual-content').innerHTML = `
+            <div class="alert alert-danger m-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Error cargando datos mensuales. Verifica la conexión.
+            </div>
+        `;
+    }
+}
+
+// Función auxiliar para obtener adelantos pendientes por barbero
+function getAdelantosPendientesPorBarbero(barberoId) {
+    const adelantosKey = `adelantos_${barberoId}`;
+    const savedAdelantos = localStorage.getItem(adelantosKey);
+    
+    if (savedAdelantos) {
+        try {
+            const adelantos = JSON.parse(savedAdelantos);
+            return adelantos.total || 0;
+        } catch (e) {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+// Función auxiliar para obtener último sábado
+function obtenerUltimoSabado() {
+    const hoy = new Date();
+    const ultimoSabado = new Date(hoy);
+    ultimoSabado.setDate(hoy.getDate() - hoy.getDay() - 1); // Sábado anterior
+    return ultimoSabado.toLocaleDateString('es-CL', { day: 'numeric', month: 'long' });
+}
+// Calcular datos para cierre de caja
+async function calcularCierreCaja() {
+    const barberos = [
+        { id: 'empleado', nombre: 'Barbero (Empleado)', comision: 0.5 },
+        { id: 'ewin', nombre: 'Ewin (Administrador)', comision: 1.0 }
+    ];
+    
+    let totalIngresado = 0;
+    let totalAdelantos = 0;
+    let totalAPagar = 0;
+    let barberosData = [];
+    let formasPago = {
+        efectivo: 0,
+        mercadoPago: 0,
+        cuentaRut: 0
+    };
+    
+   for (const barbero of barberos) {
+        // Obtener servicios de la semana
+        const servicios = await getServiciosByBarbero(barbero.id, 'semana');
+        const totalCobrado = servicios.reduce((sum, s) => sum + s.montoCobrado, 0);
+        const totalGanado = totalCobrado * barbero.comision;
+        
+        // Acumular formas de pago
+        servicios.forEach(servicio => {
+            switch(servicio.formaPago) {
+                case 'efectivo':
+                    formasPago.efectivo += servicio.montoCobrado;
+                    break;
+                case 'mercado-pago':
+                    formasPago.mercadoPago += servicio.montoCobrado;
+                    break;
+                case 'cuenta-rut':
+                    formasPago.cuentaRut += servicio.montoCobrado;
+                    break;
+            }
+        });
+        
+        // Obtener adelantos pendientes
+        const adelantosKey = `adelantos_${barbero.id}`;
+        const adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+        const adelantosPendientes = adelantosData.total;
+        const adelantosDetalle = adelantosData.detalles.filter(a => a.estado === 'pendiente');
+        
+        const netoAPagar = Math.max(0, totalGanado - adelantosPendientes);
+        
+        totalIngresado += totalCobrado;
+        totalAdelantos += adelantosPendientes;
+        totalAPagar += netoAPagar;
+        
+        barberosData.push({
+            ...barbero,
+            servicios: servicios.length,
+            totalCobrado,
+            totalGanado,
+            adelantosPendientes,
+            adelantosDetalle,
+            netoAPagar
+        });
+    }
+    
+    const gananciaBarberia = totalIngresado - totalAPagar - totalAdelantos;
+    const efectivoDisponible = formasPago.efectivo - totalAdelantos; // Efectivo menos adelantos dados
+    
+    return {
+        barberos: barberosData,
+        totalIngresado,
+        totalAdelantos,
+        totalAPagar,
+        gananciaBarberia,
+        formasPago,
+        efectivoDisponible
+    };
+}
+
+// Marcar barbero como pagado (liquidar todos sus adelantos)
+function marcarComoPagado(barberoId, montoPagado, adelantosPendientes) {
+    const nombreBarbero = barberoId === 'ewin' ? 'Ewin' : 'Barbero';
+    
+    if (!confirm(`¿Confirmar pago de $${montoPagado.toLocaleString()} a ${nombreBarbero}?\n\nEsto liquidará automáticamente todos sus adelantos pendientes ($${adelantosPendientes.toLocaleString()})`)) {
+        return;
+    }
+    
+    // Liquidar todos los adelantos pendientes
+    const adelantosKey = `adelantos_${barberoId}`;
+    let adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+    
+    // Marcar todos los adelantos pendientes como liquidados
+    adelantosData.detalles.forEach(adelanto => {
+        if (adelanto.estado === 'pendiente') {
+            adelanto.estado = 'liquidado';
+            adelanto.fechaLiquidacion = new Date().toLocaleDateString('es-CL');
+            adelanto.liquidadoPor = currentUser.nombre;
+            adelanto.observaciones = 'Liquidado en cierre de caja semanal';
+        }
+    });
+    
+    // Resetear total pendiente a 0
+    adelantosData.total = 0;
+    
+    // Guardar cambios
+    localStorage.setItem(adelantosKey, JSON.stringify(adelantosData));
+    
+    // Registrar el pago en un historial (opcional)
+    const pagoRealizado = {
+        fecha: new Date().toISOString(),
+        fechaTexto: new Date().toLocaleDateString('es-CL'),
+        barbero: nombreBarbero,
+        montoPagado: montoPagado,
+        adelantosLiquidados: adelantosPendientes,
+        realizadoPor: currentUser.nombre
+    };
+    
+    // Guardar historial de pagos
+    const historialKey = 'historialPagos';
+    let historial = JSON.parse(localStorage.getItem(historialKey) || '[]');
+    historial.unshift(pagoRealizado);
+    localStorage.setItem(historialKey, JSON.stringify(historial));
+    
+    // Refrescar la vista
+    showCierreCaja();
+    
+    alert(`✅ Pago registrado correctamente:\n\n💰 Pagado a ${nombreBarbero}: $${montoPagado.toLocaleString()}\n💸 Adelantos liquidados: $${adelantosPendientes.toLocaleString()}`);
+}
+// === ESTADÍSTICAS DE SERVICIOS POPULARES ===
+
+// Mostrar estadísticas de servicios
+function showEstadisticasServicios() {
+    const html = `
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Estadísticas de Servicios Populares
+                </h6>
+            </div>
+            <div class="card-body">
+                <!-- Selector de período -->
+                <div class="mb-4 text-center">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-primary active" onclick="updateEstadisticas('dia')" id="stats-dia">
+                            Hoy
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="updateEstadisticas('semana')" id="stats-semana">
+                            Esta Semana
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="updateEstadisticas('mes')" id="stats-mes">
+                            Este Mes
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="estadisticasContent">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('adminResults').innerHTML = html;
+    updateEstadisticas('dia');
+}
+
+// Actualizar estadísticas según período
+function updateEstadisticas(periodo) {
+    // Actualizar botones activos
+    document.querySelectorAll('#adminResults .btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`stats-${periodo}`).classList.add('active');
+    
+    // Calcular estadísticas
+    const stats = calcularEstadisticasServicios(periodo);
+    
+    const html = `
+        <!-- MÉTRICAS PRINCIPALES -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="text-center p-3 border rounded" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                    <i class="bi bi-scissors display-4 mb-2"></i>
+                    <h4>${stats.totalServicios}</h4>
+                    <small>Total Servicios</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center p-3 border rounded" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white;">
+                    <i class="bi bi-star-fill display-4 mb-2"></i>
+                    <h4>${stats.servicioMasPopular.nombre || 'N/A'}</h4>
+                    <small>Más Popular (${stats.servicioMasPopular.veces || 0} veces)</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center p-3 border rounded" style="background: linear-gradient(135deg, #ffc107, #ff8f00); color: white;">
+                    <i class="bi bi-cash-stack display-4 mb-2"></i>
+                    <h4>$${stats.ingresoPromedio.toLocaleString()}</h4>
+                    <small>Ingreso Promedio</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center p-3 border rounded" style="background: linear-gradient(135deg, #6f42c1, #5a2d91); color: white;">
+                    <i class="bi bi-trophy-fill display-4 mb-2"></i>
+                    <h4>$${stats.servicioMasRentable.ingreso || 0}</h4>
+                    <small>Más Rentable: ${stats.servicioMasRentable.nombre || 'N/A'}</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RANKING DE SERVICIOS -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">🏆 Top Servicios por Frecuencia</h6>
+                    </div>
+                    <div class="card-body">
+                        ${stats.serviciosPorFrecuencia.length === 0 ? 
+                            '<p class="text-muted text-center">No hay servicios registrados</p>' :
+                            stats.serviciosPorFrecuencia.map((servicio, index) => {
+                                const medals = ['🥇', '🥈', '🥉'];
+                                const medal = medals[index] || `#${index + 1}`;
+                                
+                                return `
+                                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-3" style="font-size: 1.5rem;">${medal}</span>
+                                            <div>
+                                                <strong>${servicio.nombre}</strong>
+                                                <div class="small text-muted">${servicio.veces} veces realizados</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-primary">${servicio.porcentaje}%</div>
+                                            <div class="small text-success">$${servicio.ingresoTotal.toLocaleString()}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">💰 Top Servicios por Ingresos</h6>
+                    </div>
+                    <div class="card-body">
+                        ${stats.serviciosPorIngresos.length === 0 ? 
+                            '<p class="text-muted text-center">No hay servicios registrados</p>' :
+                            stats.serviciosPorIngresos.map((servicio, index) => {
+                                const medals = ['🥇', '🥈', '🥉'];
+                                const medal = medals[index] || `#${index + 1}`;
+                                
+                                return `
+                                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-3" style="font-size: 1.5rem;">${medal}</span>
+                                            <div>
+                                                <strong>${servicio.nombre}</strong>
+                                                <div class="small text-muted">${servicio.veces} veces</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-success">$${servicio.ingresoTotal.toLocaleString()}</div>
+                                            <div class="small text-primary">Prom: $${servicio.promedioServicio.toLocaleString()}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ANÁLISIS Y RECOMENDACIONES -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">💡 Análisis y Recomendaciones</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>📈 Tendencias:</h6>
+                                <ul class="list-unstyled">
+                                    ${stats.recomendaciones.tendencias.map(tendencia => `<li>• ${tendencia}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>🎯 Oportunidades:</h6>
+                                <ul class="list-unstyled">
+                                    ${stats.recomendaciones.oportunidades.map(oportunidad => `<li>• ${oportunidad}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('estadisticasContent').innerHTML = html;
+}
+
+// Calcular estadísticas de servicios
+function calcularEstadisticasServicios(periodo) {
+    const barberos = ['empleado', 'ewin'];
+    let todosServicios = [];
+    let serviciosCount = {};
+    let serviciosIngresos = {};
+    
+    // Recopilar todos los servicios del período
+    barberos.forEach(barberoId => {
+        const servicios = getServiciosByBarbero(barberoId, periodo);
+        todosServicios.push(...servicios);
+        
+        servicios.forEach(servicio => {
+            servicio.servicios.forEach(nombreServicio => {
+                // Contar frecuencia
+                serviciosCount[nombreServicio] = (serviciosCount[nombreServicio] || 0) + 1;
+                
+                // Sumar ingresos
+                if (!serviciosIngresos[nombreServicio]) {
+                    serviciosIngresos[nombreServicio] = { total: 0, veces: 0 };
+                }
+                serviciosIngresos[nombreServicio].total += servicio.montoCobrado;
+                serviciosIngresos[nombreServicio].veces += 1;
+            });
+        });
+    });
+    
+    const totalServicios = todosServicios.length;
+    const ingresoTotal = todosServicios.reduce((sum, s) => sum + s.montoCobrado, 0);
+    const ingresoPromedio = totalServicios > 0 ? Math.round(ingresoTotal / totalServicios) : 0;
+    
+    // Ranking por frecuencia
+    const serviciosPorFrecuencia = Object.entries(serviciosCount)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 10)
+        .map(([nombre, veces]) => ({
+            nombre,
+            veces,
+            porcentaje: Math.round((veces / totalServicios) * 100),
+            ingresoTotal: serviciosIngresos[nombre]?.total || 0
+        }));
+    
+    // Ranking por ingresos
+    const serviciosPorIngresos = Object.entries(serviciosIngresos)
+        .sort(([,a], [,b]) => b.total - a.total)
+        .slice(0, 10)
+        .map(([nombre, data]) => ({
+            nombre,
+            veces: data.veces,
+            ingresoTotal: data.total,
+            promedioServicio: Math.round(data.total / data.veces)
+        }));
+    
+    // Servicio más popular
+    const servicioMasPopular = serviciosPorFrecuencia[0] || { nombre: '', veces: 0 };
+    
+    // Servicio más rentable
+    const servicioMasRentable = serviciosPorIngresos[0] || { nombre: '', ingreso: 0 };
+    
+    // Generar recomendaciones
+    const recomendaciones = generarRecomendaciones(serviciosPorFrecuencia, serviciosPorIngresos, totalServicios);
+    
+    return {
+        totalServicios,
+        ingresoPromedio,
+        servicioMasPopular,
+        servicioMasRentable,
+        serviciosPorFrecuencia,
+        serviciosPorIngresos,
+        recomendaciones
+    };
+}
+
+// Generar recomendaciones inteligentes
+function generarRecomendaciones(porFrecuencia, porIngresos, totalServicios) {
+    const tendencias = [];
+    const oportunidades = [];
+    
+    if (totalServicios === 0) {
+        return {
+            tendencias: ['No hay suficientes datos para generar tendencias'],
+            oportunidades: ['Registra más servicios para obtener recomendaciones']
+        };
+    }
+    
+    // Análisis de tendencias
+    if (porFrecuencia.length > 0) {
+        const masPopular = porFrecuencia[0];
+        tendencias.push(`${masPopular.nombre} es el servicio más solicitado (${masPopular.porcentaje}%)`);
+        
+        if (masPopular.porcentaje > 30) {
+            tendencias.push('Alta concentración en un servicio principal');
+        } else {
+            tendencias.push('Buena diversificación de servicios');
+        }
+    }
+    
+    if (porIngresos.length > 0) {
+        const masRentable = porIngresos[0];
+        tendencias.push(`${masRentable.nombre} genera más ingresos ($${masRentable.ingresoTotal.toLocaleString()})`);
+    }
+    
+    // Oportunidades de mejora
+    if (porFrecuencia.length > 2) {
+        const diferencia = porFrecuencia[0].veces - porFrecuencia[2].veces;
+        if (diferencia > 5) {
+            oportunidades.push('Promover servicios menos populares para equilibrar demanda');
+        }
+    }
+    
+    if (porIngresos.length > 1) {
+        const rentabilidadAlta = porIngresos.filter(s => s.promedioServicio > 20000);
+        if (rentabilidadAlta.length > 0) {
+            oportunidades.push('Enfocar marketing en servicios de mayor valor');
+        }
+    }
+    
+    if (totalServicios < 10) {
+        oportunidades.push('Aumentar volumen de servicios para mayor rentabilidad');
+    } else {
+        oportunidades.push('Mantener calidad del servicio para fidelizar clientes');
+    }
+    
+    return { tendencias, oportunidades };
+}
+// === GESTIÓN DE ADELANTOS ===
+
+// Mostrar panel de gestión de adelantos
+function showAdelantosManager() {
+    const html = `
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-cash-coin me-2"></i>
+                    Gestión de Adelantos y Retiros
+                </h6>
+            </div>
+            <div class="card-body">
+                <!-- Formulario para nuevo adelanto -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0">Registrar Nuevo Adelanto</h6>
+                            </div>
+                            <div class="card-body">
+                                <form onsubmit="registrarAdelanto(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label">Barbero:</label>
+                                        <select class="form-select" id="adelantoBarbero" required>
+                                            <option value="">Seleccionar...</option>
+                                            <option value="empleado">Barbero (Empleado)</option>
+                                            <option value="ewin">Ewin (Administrador)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Monto:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="adelantoMonto" 
+                                                   min="1000" step="1000" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Motivo:</label>
+                                        <input type="text" class="form-control" id="adelantoMotivo" 
+                                               placeholder="Ej: Adelanto sueldo" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="bi bi-plus-circle me-2"></i>
+                                        Registrar Adelanto
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">Resumen de Adelantos</h6>
+                            </div>
+                            <div class="card-body" id="resumenAdelantos">
+                                <!-- Se llena dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Historial de adelantos -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Historial de Adelantos</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="historialAdelantos">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('adminResults').innerHTML = html;
+    updateResumenAdelantos();
+    updateHistorialAdelantos();
+}
+
+// Registrar nuevo adelanto
+function registrarAdelanto(event) {
+    event.preventDefault();
+    
+    const barberoId = document.getElementById('adelantoBarbero').value;
+    const monto = parseInt(document.getElementById('adelantoMonto').value);
+    const motivo = document.getElementById('adelantoMotivo').value;
+    
+    if (!barberoId || !monto || !motivo) {
+        alert('Todos los campos son obligatorios');
+        return;
+    }
+    
+    // Obtener adelantos existentes
+    const adelantosKey = `adelantos_${barberoId}`;
+    let adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+    
+    // Crear nuevo adelanto
+    const nuevoAdelanto = {
+        id: Date.now().toString(),
+        fecha: new Date().toISOString(),
+        fechaTexto: new Date().toLocaleDateString('es-CL'),
+        monto: monto,
+        motivo: motivo,
+        estado: 'pendiente',
+        registradoPor: currentUser.nombre
+    };
+    
+    // Agregar al total y al historial
+    adelantosData.total += monto;
+    adelantosData.detalles.unshift(nuevoAdelanto);
+    
+    // Guardar
+    localStorage.setItem(adelantosKey, JSON.stringify(adelantosData));
+    
+    // Limpiar formulario
+    document.getElementById('adelantoBarbero').value = '';
+    document.getElementById('adelantoMonto').value = '';
+    document.getElementById('adelantoMotivo').value = '';
+    
+    // Actualizar interfaz
+    updateResumenAdelantos();
+    updateHistorialAdelantos();
+    
+    // Si estamos viendo el resumen de ese barbero, actualizarlo
+    if (adminViewMode === barberoId || (adminViewMode === 'ewin' && barberoId === 'ewin')) {
+        updateSummaryForAdmin();
+    }
+    
+    alert(`✅ Adelanto de $${monto.toLocaleString()} registrado para ${barberoId === 'ewin' ? 'Ewin' : 'Barbero'}`);
+}
+
+// Actualizar resumen de adelantos
+function updateResumenAdelantos() {
+    const barberos = ['empleado', 'ewin'];
+    let html = '';
+    let totalGeneral = 0;
+    
+    barberos.forEach(barberoId => {
+        const adelantosKey = `adelantos_${barberoId}`;
+        const adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+        const nombre = barberoId === 'ewin' ? 'Ewin' : 'Barbero';
+        
+        totalGeneral += adelantosData.total;
+        
+        html += `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span><strong>${nombre}:</strong></span>
+                <span class="text-danger">$${adelantosData.total.toLocaleString()}</span>
+            </div>
+        `;
+    });
+    
+    html += `
+        <hr>
+        <div class="d-flex justify-content-between align-items-center">
+            <span><strong>Total General:</strong></span>
+            <span class="text-danger fw-bold">$${totalGeneral.toLocaleString()}</span>
+        </div>
+    `;
+    
+    document.getElementById('resumenAdelantos').innerHTML = html;
+}
+
+// Actualizar historial de adelantos
+function updateHistorialAdelantos() {
+    const barberos = ['empleado', 'ewin'];
+    let todosAdelantos = [];
+    
+    // Recopilar todos los adelantos
+    barberos.forEach(barberoId => {
+        const adelantosKey = `adelantos_${barberoId}`;
+        const adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+        const nombre = barberoId === 'ewin' ? 'Ewin' : 'Barbero';
+        
+        adelantosData.detalles.forEach(adelanto => {
+            todosAdelantos.push({
+                ...adelanto,
+                barberoId: barberoId,
+                barberoNombre: nombre
+            });
+        });
+    });
+    
+    // Ordenar por fecha más reciente
+    todosAdelantos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    let html = '';
+    
+    if (todosAdelantos.length === 0) {
+        html = '<p class="text-muted text-center">No hay adelantos registrados</p>';
+    } else {
+        html = todosAdelantos.slice(0, 10).map(adelanto => {
+            const estadoClass = adelanto.estado === 'liquidado' ? 'success' : 'warning';
+            const estadoTexto = adelanto.estado === 'liquidado' ? 'Liquidado' : 'Pendiente';
+            
+            return `
+                <div class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded">
+                    <div>
+                        <strong>${adelanto.barberoNombre}</strong>
+                        <div class="small text-muted">${adelanto.motivo}</div>
+                        <div class="small text-muted">
+                            <i class="bi bi-calendar me-1"></i>${adelanto.fechaTexto}
+                            <i class="bi bi-person ms-2 me-1"></i>Por: ${adelanto.registradoPor}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-danger">$${adelanto.monto.toLocaleString()}</div>
+                        <span class="badge bg-${estadoClass}">${estadoTexto}</span>
+                        ${adelanto.estado === 'pendiente' ? `
+                            <button class="btn btn-sm btn-outline-success mt-1" 
+                                    onclick="liquidarAdelanto('${adelanto.id}', '${adelanto.barberoId}', ${adelanto.monto})">
+                                <i class="bi bi-check me-1"></i>Liquidar
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    document.getElementById('historialAdelantos').innerHTML = html;
+}
+
+// Liquidar adelanto (marcarlo como pagado)
+function liquidarAdelanto(adelantoId, barberoId, monto) {
+    if (!confirm(`¿Liquidar adelanto de $${monto.toLocaleString()}?`)) {
+        return;
+    }
+    
+    const adelantosKey = `adelantos_${barberoId}`;
+    let adelantosData = JSON.parse(localStorage.getItem(adelantosKey) || '{"total": 0, "detalles": []}');
+    
+    // Encontrar el adelanto y marcarlo como liquidado
+    const adelantoIndex = adelantosData.detalles.findIndex(a => a.id === adelantoId);
+    if (adelantoIndex !== -1) {
+        adelantosData.detalles[adelantoIndex].estado = 'liquidado';
+        adelantosData.detalles[adelantoIndex].fechaLiquidacion = new Date().toLocaleDateString('es-CL');
+        adelantosData.detalles[adelantoIndex].liquidadoPor = currentUser.nombre;
+        
+        // Reducir del total pendiente
+        adelantosData.total = Math.max(0, adelantosData.total - monto);
+        
+        // Guardar cambios
+        localStorage.setItem(adelantosKey, JSON.stringify(adelantosData));
+        
+        // Actualizar interfaz
+        updateResumenAdelantos();
+        updateHistorialAdelantos();
+        
+        // Actualizar resumen si corresponde
+        if (adminViewMode === barberoId || (adminViewMode === 'ewin' && barberoId === 'ewin')) {
+            updateSummaryForAdmin();
+        }
+        
+        alert('✅ Adelanto liquidado correctamente');
+    }
+}
+        // Actualizar summary para usar nueva lógica de comisión
+        const originalUpdateSummary = updateSummary;
+        updateSummary = async function() {
+            let serviciosPeriodo = await getServiciosPorPeriodo(currentPeriod);
+            // PROTECCIÓN: Si no es un array, usar array vacío
+if (!Array.isArray(serviciosPeriodo)) {
+    console.log('❌ serviciosPeriodo no es array, usando array vacío');
+    serviciosPeriodo = [];
+}
+            // USAR COMISIÓN CORRECTA SEGÚN EL ROL
+            const comision = getComision(currentUser.rol);
+            const miParte = serviciosPeriodo.reduce((sum, s) => {
+                return sum + (s.miParte || (s.montoCobrado * comision));
+            }, 0);
+            
+            const adelantos = getAdelantosPendientes();
+            const totalNeto = miParte - adelantos;
+            
+            document.getElementById('totalRecaudado').textContent = `$${miParte.toLocaleString()}`;
+            document.getElementById('serviciosPeriodo').textContent = serviciosPeriodo.length;
+            document.getElementById('adelantosPendientes').textContent = `$${adelantos.toLocaleString()}`;
+            document.getElementById('totalNeto').textContent = `$${totalNeto.toLocaleString()}`;
+            document.getElementById('totalServiciosPeriodo').textContent = `${serviciosPeriodo.length} servicios`;
+            
+            const netoElement = document.querySelector('#totalNeto').parentElement.parentElement.parentElement.firstElementChild;
+            if (totalNeto < 0) {
+                netoElement.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+            } else {
+                netoElement.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            }
+            
+            displayServicesList(serviciosPeriodo);
+            
+            // Auto-actualizar comparativa si es admin
+            if (currentUser.rol === 'administrador') {
+                updateComparativa();
+            }
+        };
+        
+        // Inicializar funciones admin cuando sea necesario
+        setTimeout(() => {
+            if (currentUser && currentUser.rol === 'administrador') {
+                addAdminSection();
+                updateComparativa();
+                
+                // Cambiar color de stat card para admin
+                const mainStatCard = document.getElementById('totalRecaudado').closest('.stat-card');
+                if (mainStatCard) {
+                    mainStatCard.style.background = 'linear-gradient(135deg, #ffc107, #ff8f00)';
+                }
+            }
+        }, 1000);
+        
+        console.log('✅ Sistema con 3 funciones administrativas cargado correctamente');
+    </script>
+   <!-- LIBRERÍAS FIREBASE - Agregar ANTES de config.js -->
+<!-- LIBRERÍAS FIREBASE COMPLETAS -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="js/config.js"></script>
+</body>
+</html>
