@@ -189,25 +189,29 @@
         <div class="main-container">
             
             <!-- Pestañas -->
-            <ul class="nav nav-tabs mb-4" id="mainTabs">
-                <li class="nav-item">
-                    <button class="nav-link active" id="registro-tab" data-bs-toggle="tab" data-bs-target="#registro">
-                        <i class="bi bi-plus-circle me-2"></i>Registrar Servicio
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen">
-                        <i class="bi bi-graph-up me-2"></i>Mi Resumen
-                    </button>
-                </li>
-                <!-- Pestaña Admin (solo visible para Ewin) -->
-                <li class="nav-item" id="admin-tab-container" style="display: none;">
-                    <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin">
-                        <i class="bi bi-gear me-2"></i>Administración
-                    </button>
-                </li>
-            </ul>
-
+          <ul class="nav nav-tabs mb-4" id="mainTabs">
+    <li class="nav-item">
+        <button class="nav-link active" id="registro-tab" data-bs-toggle="tab" data-bs-target="#registro">
+            <i class="bi bi-plus-circle me-2"></i>Registrar Servicio
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen">
+            <i class="bi bi-graph-up me-2"></i>Mi Resumen
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="servicios-tab" data-bs-toggle="tab" data-bs-target="#servicios">
+            <i class="bi bi-list-check me-2"></i>Ver Servicios
+        </button>
+    </li>
+    <!-- Pestaña Admin (solo visible para Ewin) -->
+    <li class="nav-item" id="admin-tab-container" style="display: none;">
+        <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin">
+            <i class="bi bi-gear me-2"></i>Administración
+        </button>
+    </li>
+</ul>
             <!-- Contenido de las pestañas -->
             <div class="tab-content" id="mainTabsContent">
                 
@@ -430,19 +434,37 @@
                         </div>
                     </div>
                     
-                    <!-- Lista de servicios del período -->
+                   
+              
+                <!-- PESTAÑA 3: VER SERVICIOS -->
+                <div class="tab-pane fade" id="servicios">
+                    
+                    <!-- Selección de período -->
+                    <div class="period-tabs text-center mb-4">
+                        <button class="btn active" id="btn-servicios-dia" onclick="changePeriodServicios('dia')">
+                            <i class="bi bi-calendar-day me-1"></i>Hoy
+                        </button>
+                        <button class="btn" id="btn-servicios-semana" onclick="changePeriodServicios('semana')">
+                            <i class="bi bi-calendar-week me-1"></i>Esta Semana
+                        </button>
+                        <button class="btn" id="btn-servicios-mes" onclick="changePeriodServicios('mes')">
+                            <i class="bi bi-calendar-month me-1"></i>Este Mes
+                        </button>
+                    </div>
+                    
+                    <!-- Lista de servicios -->
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">
                                         <i class="bi bi-list-check me-2"></i>
-                                        <span id="tituloServicios">Mis Servicios de Hoy</span>
+                                        <span id="tituloServiciosTab">Mis Servicios de Hoy</span>
                                     </h5>
-                                    <span class="badge bg-primary" id="totalServiciosPeriodo">0 servicios</span>
+                                    <span class="badge bg-primary" id="totalServiciosTab">0 servicios</span>
                                 </div>
                                 <div class="card-body">
-                                    <div id="serviciosDelDia">
+                                    <div id="serviciosDelDiaTab">
                                         <div class="text-center text-muted py-4">
                                             <i class="bi bi-inbox display-4 mb-3"></i>
                                             <button class="btn btn-primary" onclick="goToRegistro()">
@@ -457,8 +479,6 @@
                     </div>
                     
                 </div>
-                
-                <!-- PESTAÑA 3: ADMINISTRACIÓN (Solo para Ewin) -->
                 <div class="tab-pane fade" id="admin">
                     <div class="row">
                         <div class="col-12">
@@ -544,6 +564,8 @@
             
             // Actualizar resúmenes
            await updateSummary();
+            // Cargar también la pestaña de servicios
+           await updateServiciosTab();
         });
         
         // Verificar sesión activa
@@ -709,7 +731,8 @@ async function handleServiceSubmit(e) {
 
 showServiceConfirmation(formData);
         
-       await updateSummary();
+      await updateSummary();
+        await updateServiciosTab();
         console.log('Servicio registrado:', formData);
     } catch (error) {
         alert('Error al registrar servicio: ' + error.message);
@@ -1074,7 +1097,8 @@ if (!Array.isArray(serviciosPeriodo)) {
                 
                 // Actualizar datos globales
                 serviciosDelDia = servicios;
-               await updateSummary();
+              await updateSummary();
+        await updateServiciosTab();
                 updateComparativa();
                 
                 alert('✅ Monto actualizado');
@@ -3589,7 +3613,113 @@ if (!Array.isArray(serviciosPeriodo)) {
                 }
             }
         }, 1000);
+        // === FUNCIONES PARA LA NUEVA PESTAÑA VER SERVICIOS ===
         
+        // Variable para el período actual de la pestaña servicios
+        let currentPeriodServicios = 'dia';
+        
+        // Cambiar período en la pestaña servicios
+        async function changePeriodServicios(period) {
+            currentPeriodServicios = period;
+            
+            // Actualizar botones activos
+            document.querySelectorAll('[id^="btn-servicios-"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-servicios-${period}`).classList.add('active');
+            
+            // Actualizar labels
+            const labels = {
+                'dia': { titulo: 'Mis Servicios de Hoy' },
+                'semana': { titulo: 'Mis Servicios de esta Semana' },
+                'mes': { titulo: 'Mis Servicios de este Mes' }
+            };
+            
+            document.getElementById('tituloServiciosTab').textContent = labels[period].titulo;
+            
+            await updateServiciosTab();
+        }
+        
+        // Actualizar contenido de la pestaña servicios
+        async function updateServiciosTab() {
+            let serviciosPeriodo = await getServiciosPorPeriodo(currentPeriodServicios);
+            
+            // PROTECCIÓN: Si no es un array, usar array vacío
+            if (!Array.isArray(serviciosPeriodo)) {
+                console.log('⚠ serviciosPeriodo no es array, usando array vacío');
+                serviciosPeriodo = [];
+            }
+            
+            document.getElementById('totalServiciosTab').textContent = `${serviciosPeriodo.length} servicios`;
+            
+            // Mostrar lista de servicios en la pestaña
+            displayServicesListTab(serviciosPeriodo);
+        }
+        
+        // Mostrar lista de servicios en la pestaña Ver Servicios
+        function displayServicesListTab(servicios) {
+            const container = document.getElementById('serviciosDelDiaTab');
+            
+            if (servicios.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox display-4 mb-3"></i>
+                        <p>No hay servicios registrados en este período</p>
+                        <button class="btn btn-primary" onclick="goToRegistro()">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Registrar Primer Servicio
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Ordenar por fecha más reciente
+            servicios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            
+            container.innerHTML = servicios.map((servicio, index) => {
+                const serviciosList = servicio.servicios.join(' + ');
+                const fechaFormateada = new Date(servicio.fecha).toLocaleDateString('es-CL', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const comision = getComision(currentUser.rol);
+                const miParte = servicio.miParte || (servicio.montoCobrado * comision);
+                const porcentajeTexto = comision === 1.0 ? '100%' : '50%';
+                
+                const editButton = currentUser.rol === 'administrador' ? 
+                    `<button class="btn btn-sm btn-outline-danger ms-2" onclick="deleteServiceForAdmin('${servicio.id}', '${currentUser.barbero}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>` : '';
+                
+                return `
+                    <div class="service-item fade-in">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="service-number me-3">${index + 1}</span>
+                                <div>
+                                    <h6 class="mb-1">${serviciosList}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>${fechaFormateada}
+                                        <i class="bi bi-credit-card ms-2 me-1"></i>${servicio.formaPagoTexto}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">$${servicio.montoCobrado.toLocaleString()}</div>
+                                <small class="text-muted">Total cobrado</small>
+                                <div class="small text-primary">Mi parte: $${miParte.toLocaleString()} (${porcentajeTexto})</div>
+                                ${editButton}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
         console.log('✅ Sistema con 3 funciones administrativas cargado correctamente');
     </script>
    <!-- LIBRERÍAS FIREBASE - Agregar ANTES de config.js -->
