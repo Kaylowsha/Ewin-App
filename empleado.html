@@ -476,9 +476,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                </div>
+                 </div>
+                
+                <!-- PESTAÑA 4: ADMINISTRACIÓN (Solo para Ewin) -->
                 <div class="tab-pane fade" id="admin">
                     <div class="row">
                         <div class="col-12">
@@ -926,7 +926,7 @@ if (!Array.isArray(serviciosPeriodo)) {
             document.getElementById('serviciosPeriodo').textContent = serviciosPeriodo.length;
             document.getElementById('adelantosPendientes').textContent = `${adelantos.toLocaleString()}`;
             document.getElementById('totalNeto').textContent = `${totalNeto.toLocaleString()}`;
-            document.getElementById('totalServiciosPeriodo').textContent = `${serviciosPeriodo.length} servicios`;
+          
             
             // Cambiar color del total neto
             const netoElement = document.querySelector('#totalNeto').parentElement.parentElement.parentElement.firstElementChild;
