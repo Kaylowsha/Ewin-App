@@ -560,7 +560,14 @@
             loadAllData();
             
             // Configurar eventos
-            setupEventListeners();
+          // Configurar eventos
+setupEventListeners();
+
+// Inicializar pestaña servicios para Safari
+setTimeout(initServiciosTab, 1000);
+
+// Cargar datos
+loadAllData();
             
             // Actualizar resúmenes
            await updateSummary();
@@ -3617,7 +3624,14 @@ if (!Array.isArray(serviciosPeriodo)) {
             }
         }, 1000);
         // === FUNCIONES PARA LA NUEVA PESTAÑA VER SERVICIOS ===
-        
+        // === FUNCIONES PARA LA NUEVA PESTAÑA VER SERVICIOS ===
+
+// Inicializar la pestaña servicios (para Safari)
+function initServiciosTab() {
+    if (document.getElementById('serviciosDelDiaTab')) {
+        updateServiciosTab();
+    }
+}
         // Variable para el período actual de la pestaña servicios
         let currentPeriodServicios = 'dia';
         
