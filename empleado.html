@@ -1348,7 +1348,7 @@ if (!Array.isArray(serviciosPeriodo)) {
     document.getElementById('serviciosPeriodo').textContent = serviciosPeriodo.length;
     document.getElementById('adelantosPendientes').textContent = `$${adelantos.toLocaleString()}`;
     document.getElementById('totalNeto').textContent = `$${totalNeto.toLocaleString()}`;
-    document.getElementById('totalServiciosPeriodo').textContent = `${serviciosPeriodo.length} servicios`;
+    
     
     // Cambiar color del total neto
     const netoElement = document.querySelector('#totalNeto').parentElement.parentElement.parentElement.firstElementChild;
@@ -3657,21 +3657,36 @@ function initServiciosTab() {
             await updateServiciosTab();
         }
         
-        // Actualizar contenido de la pestaña servicios
-        async function updateServiciosTab() {
-            let serviciosPeriodo = await getServiciosPorPeriodo(currentPeriodServicios);
-            
-            // PROTECCIÓN: Si no es un array, usar array vacío
-            if (!Array.isArray(serviciosPeriodo)) {
-                console.log('⚠ serviciosPeriodo no es array, usando array vacío');
-                serviciosPeriodo = [];
-            }
-            
-            document.getElementById('totalServiciosTab').textContent = `${serviciosPeriodo.length} servicios`;
-            
-            // Mostrar lista de servicios en la pestaña
-            displayServicesListTab(serviciosPeriodo);
+       // Actualizar contenido de la pestaña servicios
+async function updateServiciosTab() {
+    // TEMPORAL: usar localStorage hasta que Firebase esté disponible
+    let serviciosPeriodo = [];
+    
+    try {
+        if (typeof getServiciosPorPeriodo === 'function') {
+            serviciosPeriodo = await getServiciosPorPeriodo(currentPeriodServicios);
         }
+    } catch (error) {
+        console.log('Usando datos locales temporalmente');
+        // Usar datos del localStorage como respaldo
+        const todayKey = `servicios_${currentUser.barbero}_${new Date().toDateString()}`;
+        const localData = localStorage.getItem(todayKey);
+        if (localData) {
+            serviciosPeriodo = JSON.parse(localData) || [];
+        }
+    }
+    
+    // PROTECCIÓN: Si no es un array, usar array vacío
+    if (!Array.isArray(serviciosPeriodo)) {
+        console.log('⚠ serviciosPeriodo no es array, usando array vacío');
+        serviciosPeriodo = [];
+    }
+    
+    document.getElementById('totalServiciosTab').textContent = `${serviciosPeriodo.length} servicios`;
+    
+    // Mostrar lista de servicios en la pestaña
+    displayServicesListTab(serviciosPeriodo);
+}
         
         // Mostrar lista de servicios en la pestaña Ver Servicios
         function displayServicesListTab(servicios) {
