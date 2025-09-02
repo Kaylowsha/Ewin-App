@@ -3593,7 +3593,7 @@ if (!Array.isArray(serviciosPeriodo)) {
             document.getElementById('serviciosPeriodo').textContent = serviciosPeriodo.length;
             document.getElementById('adelantosPendientes').textContent = `$${adelantos.toLocaleString()}`;
             document.getElementById('totalNeto').textContent = `$${totalNeto.toLocaleString()}`;
-            document.getElementById('totalServiciosPeriodo').textContent = `${serviciosPeriodo.length} servicios`;
+           
             
             const netoElement = document.querySelector('#totalNeto').parentElement.parentElement.parentElement.firstElementChild;
             if (totalNeto < 0) {
@@ -3688,23 +3688,42 @@ async function updateServiciosTab() {
     displayServicesListTab(serviciosPeriodo);
 }
         
-        // Mostrar lista de servicios en la pestaña Ver Servicios
-        function displayServicesListTab(servicios) {
-            const container = document.getElementById('serviciosDelDiaTab');
-            
-            if (servicios.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-inbox display-4 mb-3"></i>
-                        <p>No hay servicios registrados en este período</p>
-                        <button class="btn btn-primary" onclick="goToRegistro()">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            Registrar Primer Servicio
-                        </button>
-                    </div>
-                `;
-                return;
-            }
+       // Mostrar lista de servicios en la pestaña Ver Servicios
+function displayServicesListTab(servicios) {
+    const container = document.getElementById('serviciosDelDiaTab');
+    
+    if (!container) {
+        console.log('Container serviciosDelDiaTab no encontrado');
+        return;
+    }
+    
+    if (!servicios || servicios.length === 0) {
+        container.innerHTML = `
+            <div class="period-tabs text-center mb-4">
+                <button class="btn active" onclick="alert('Botón Hoy funcionando')">
+                    <i class="bi bi-calendar-day me-1"></i>Hoy
+                </button>
+                <button class="btn" onclick="alert('Botón Semana funcionando')">
+                    <i class="bi bi-calendar-week me-1"></i>Esta Semana
+                </button>
+                <button class="btn" onclick="alert('Botón Mes funcionando')">
+                    <i class="bi bi-calendar-month me-1"></i>Este Mes
+                </button>
+            </div>
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-inbox display-4 mb-3"></i>
+                <p>No hay servicios registrados en este período</p>
+                <button class="btn btn-primary" onclick="goToRegistro()">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Registrar Primer Servicio
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    // Si hay servicios, mostrarlos aquí...
+}
             
             // Ordenar por fecha más reciente
             servicios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
