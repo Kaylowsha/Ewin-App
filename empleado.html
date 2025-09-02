@@ -437,7 +437,7 @@
                    
               
                 <!-- PESTAÑA 3: VER SERVICIOS -->
-                <div class="tab-pane fade" id="servicios">
+                <div class="tab-pane fade show" id="servicios">
                     
                     <!-- Selección de período -->
                     <div class="period-tabs text-center mb-4">
@@ -565,7 +565,10 @@
             // Actualizar resúmenes
            await updateSummary();
             // Cargar también la pestaña de servicios
-           await updateServiciosTab();
+          // Cargar también la pestaña de servicios
+if (typeof updateServiciosTab === 'function') {
+    await updateServiciosTab();
+}
         });
         
         // Verificar sesión activa
